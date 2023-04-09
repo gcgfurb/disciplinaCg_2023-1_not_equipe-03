@@ -19,10 +19,10 @@ namespace gcgcg
   {
     private readonly float[] _sruEixos =
     {
-       0.5f,  0.0f,  0.0f, // X+
-      -0.5f,  0.0f,  0.0f, // X-
-       0.0f,  0.5f,  0.0f, // Y+
-       0.0f, -0.5f,  0.0f, // Y-
+       0.6f,  0.0f,  0.0f, // X+
+       0.0f,  0.0f,  0.0f, // X-
+       0.0f,  0.6f,  0.0f, // Y+
+       0.0f,  0.0f,  0.0f, // Y-
        0.0f,  0.0f,  0.5f, // Z+
        0.0f,  0.0f, -0.5f, // Z-
     };
@@ -48,7 +48,7 @@ namespace gcgcg
     {
       base.OnLoad();
 
-      GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      GL.ClearColor(128.0f/255.0f, 128.0f/255.0f, 128.0f/255.0f, 1.0f);
       
       // Eixos
       _vertexBufferObject_sruEixos = GL.GenBuffer();
@@ -64,10 +64,16 @@ namespace gcgcg
       
       objetoNovo = new Objeto(objetoId, null);
       objetosLista.Add(objetoNovo);
-      objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.25));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.25));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.75));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.75));
+      // objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.25));
+      // objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.25));
+      // objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.75));
+      // objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.75)); 
+      
+      for (int i = 0; i < 360; i += 5) {
+          Ponto4D ponto = new Ponto4D(Matematica.GerarPtosCirculo(i, 0.3f));
+          objetoNovo.PontosAdicionar(ponto);
+      }
+
       objetoNovo.Atualizar();
       objetoSelecionado = objetoNovo;
       objetoNovo = null;

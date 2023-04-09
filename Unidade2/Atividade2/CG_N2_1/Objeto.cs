@@ -16,17 +16,18 @@ namespace gcgcg
   internal class Objeto
   {
     protected List<Ponto4D> pontosLista = new List<Ponto4D>();
-
+    
     protected char rotulo;
     protected Objeto paiRef;
     public Objeto PaiRef { get => paiRef; }
-    private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
+    private PrimitiveType primitivaTipo = PrimitiveType.Points;
     public PrimitiveType PrimitivaTipo { get => primitivaTipo; set => primitivaTipo = value; }
     private List<Objeto> objetosLista = new List<Objeto>();
 
     private int _vertexBufferObject_sruEixos;
     private int _vertexArrayObject_sruEixos;
-    private Shader _shaderBranco;
+    // private Shader _shaderBranco;
+    private Shader _shaderAmarelo;
 
     public Objeto(char rotulo, Objeto paiRef)
     {
@@ -53,14 +54,16 @@ namespace gcgcg
       GL.BindVertexArray(_vertexArrayObject_sruEixos);
       GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
       GL.EnableVertexAttribArray(0);
-      _shaderBranco = new Shader("Shaders/shader.vert", "Shaders/shaderBranco.frag");
+      // _shaderBranco = new Shader("Shaders/shader.vert", "Shaders/shaderBranco.frag");
+      _shaderAmarelo = new Shader("Shaders/shader.vert", "Shaders/shaderAmarelo.frag");
     }
 
     public void Desenhar()
     {
 #if CG_OpenGL && !CG_DirectX
       GL.BindVertexArray(_vertexArrayObject_sruEixos);
-      _shaderBranco.Use();
+      // _shaderBranco.Use();
+      _shaderAmarelo.Use();
       GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL
       Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
