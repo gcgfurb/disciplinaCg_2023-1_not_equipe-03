@@ -62,7 +62,7 @@ namespace gcgcg
       _shaderVerde = new Shader("Shaders/shader.vert", "Shaders/shaderVerde.frag");
       _shaderAzul = new Shader("Shaders/shader.vert", "Shaders/shaderAzul.frag");
       
-      objetoNovo = new Objeto(objetoId, null);
+      objetoNovo = new Objeto(null);
       objetosLista.Add(objetoNovo);
       // objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.25));
       // objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.25));
@@ -74,7 +74,7 @@ namespace gcgcg
           objetoNovo.PontosAdicionar(ponto);
       }
 
-      objetoNovo.Atualizar();
+      objetoNovo.ObjetoAtualizar();
       objetoSelecionado = objetoNovo;
       objetoNovo = null;
 
