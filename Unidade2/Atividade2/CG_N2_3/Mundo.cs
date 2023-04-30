@@ -41,6 +41,7 @@ namespace gcgcg
 	// Guardando informações iniciais p/ uso futuro.
 	private double anguloSrPalito = 45;
 	private double raioSrPalito = 0.5;
+  private double movimento = 0;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -169,45 +170,46 @@ namespace gcgcg
       
       if (input.IsKeyPressed(Keys.Q)) {
           // Movendo para a esquerda.
+          movimento -= 0.05;
           objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X - 0.05, objetoSelecionado.PontosId(0).Y), 0);
           objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X - 0.05, objetoSelecionado.PontosId(1).Y), 1);
           objetoSelecionado.ObjetoAtualizar();
-      } else {
-          if (input.IsKeyPressed(Keys.W)) {
-              // Movendo para a direita.
-              objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + 0.05, objetoSelecionado.PontosId(0).Y), 0);
-              objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + 0.05, objetoSelecionado.PontosId(1).Y), 1);
-              objetoSelecionado.ObjetoAtualizar();
-          } else {
-			  if (input.IsKeyPressed(Keys.A)) {
-			      // Diminuindo o tamanho.
-				  objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X - 0.05, objetoSelecionado.PontosId(1).Y - 0.05), 1);
+      } else if (input.IsKeyPressed(Keys.W)) {
+          // Movendo para a direita.
+          movimento += 0.05;
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + 0.05, objetoSelecionado.PontosId(0).Y), 0);
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + 0.05, objetoSelecionado.PontosId(1).Y), 1);
+          objetoSelecionado.ObjetoAtualizar();
+      } else if (input.IsKeyPressed(Keys.A)) {
+			    // Diminuindo o tamanho.
 				  raioSrPalito -= 0.05;
+          objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
+          // Corrigindo a movimentação.
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + movimento, objetoSelecionado.PontosId(1).Y), 1);
 				  objetoSelecionado.ObjetoAtualizar();
-			  } else {
-				  if (input.IsKeyPressed(Keys.S)) {
-					  // Aumentando o tamanho.
-					  objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + 0.05, objetoSelecionado.PontosId(1).Y + 0.05), 1);
-					  raioSrPalito += 0.05;
-				      objetoSelecionado.ObjetoAtualizar();
-				  } else {
-					  if (input.IsKeyPressed(Keys.Z)) {
-						  // Diminuindo o ângulo.
-						  anguloSrPalito -= 5;
-						  objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
-						  objetoSelecionado.ObjetoAtualizar();
-					  } else {
-						  if (input.IsKeyPressed(Keys.X)) {
-							  // Aumentando o ângulo.
-							  anguloSrPalito += 5;
-							  objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
-						      objetoSelecionado.ObjetoAtualizar();
-						  }
-					  }
-				  }
-			  }
-		  }
-      }
+			} else if (input.IsKeyPressed(Keys.S)) {
+					// Aumentando o tamanho.
+					raioSrPalito += 0.05;
+          objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
+          // Corrigindo a movimentação.
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + movimento, objetoSelecionado.PontosId(1).Y), 1);
+				  objetoSelecionado.ObjetoAtualizar();
+			} else if (input.IsKeyPressed(Keys.Z)) {
+				  // Diminuindo o ângulo.
+					anguloSrPalito -= 5;
+					objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
+          // Corrigindo a movimentação.
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + movimento, objetoSelecionado.PontosId(1).Y), 1);
+					objetoSelecionado.ObjetoAtualizar();
+			} else if (input.IsKeyPressed(Keys.X)) {
+					// Aumentando o ângulo.
+					anguloSrPalito += 5;
+					objetoSelecionado.PontosAlterar(new Ponto4D(Matematica.GerarPtosCirculo(anguloSrPalito, raioSrPalito)), 1);
+          // Corrigindo a movimentação.
+          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(1).X + movimento, objetoSelecionado.PontosId(1).Y), 1);
+					objetoSelecionado.ObjetoAtualizar();
+			}
+
       #endregion
 
       /*
