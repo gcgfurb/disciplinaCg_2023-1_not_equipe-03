@@ -20,6 +20,7 @@ namespace gcgcg
   {
     private List<Objeto> objetosLista = new List<Objeto>();
     private Objeto objetoSelecionado = null;
+    private Objeto objAtual = null;
     private char rotulo = '@';
 
     private readonly float[] _sruEixos =
@@ -82,6 +83,34 @@ namespace gcgcg
 
       Objeto objetoNovo = null;
 
+      #region Poliedro
+      // Pontos
+      objetoNovo = new Ponto(null, new Ponto4D(-0.5, -0.5));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      objetoNovo = new Ponto(null, new Ponto4D(-0.5, 0.5));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      objetoNovo = new Ponto(null, new Ponto4D(0.5, 0.5));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      objetoNovo = new Ponto(null, new Ponto4D(0.5, -0.5));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+
+      // Retas
+      objetoNovo = new SegReta(null, objetosLista[0].PontosId(0), objetosLista[1].PontosId(0));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      objetoNovo = new SegReta(null, objetosLista[1].PontosId(0), objetosLista[2].PontosId(0));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      objetoNovo = new SegReta(null, objetosLista[2].PontosId(0), objetosLista[3].PontosId(0));
+      ObjetoNovo(objetoNovo); objetoNovo = null;
+      #endregion
+
+      #region spline
+      //
+      #endregion
+
+
+      // -------------------------------------------------
+
+
       #region Objeto: polígono qualquer  
       // objetoNovo = new Poligono(null);
       // objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.25));
@@ -113,27 +142,6 @@ namespace gcgcg
       // objetoNovo.PrimitivaTamanho = 10;
       // ObjetoNovo(objetoNovo); objetoNovo = null;
       #endregion
-
-#if CG_Privado
-      #region Objeto: circulo  
-      objetoNovo = new Circulo(null, 0.2, new Ponto4D());
-      objetoNovo.shaderCor = new Shader("Shaders/shader.vert", "Shaders/shaderAmarela.frag");
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      #endregion
-
-      #region Objeto: SrPalito  
-      objetoNovo = new SrPalito(null);
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      SrPalito objSrPalito = objetoSelecionado as SrPalito;
-      #endregion
-
-      #region Objeto: Spline
-      objetoNovo = new Spline(null);
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      Spline objSpline = objetoSelecionado as Spline;
-      #endregion
-#endif
-
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -157,89 +165,18 @@ namespace gcgcg
 
       #region Teclado
       var input = KeyboardState;
-      if (input.IsKeyDown(Keys.Escape))
-      {
-        Close();
-      }
-      else
-      {
-        if (input.IsKeyDown(Keys.Right))
-        {
-          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + 0.005, objetoSelecionado.PontosId(0).Y, 0), 0);
-          objetoSelecionado.ObjetoAtualizar();
-        }
-        else
-        {
-          if (input.IsKeyPressed(Keys.P))
-          {
-            Console.WriteLine(objetoSelecionado);
-          }
-          else
-          {
-            if (input.IsKeyPressed(Keys.Space))
-            {
-              if (objetoSelecionado == null)
-                Console.WriteLine("objetoSelecionado: NULL!");
-              else if (objetosLista.Count == 0)
-                Console.WriteLine("objetoLista: vazia!");
-              else
-              {
-                int ind = 0;
-                foreach (var objetoNovo in objetosLista)
-                {
-                  if (objetoNovo == objetoSelecionado)
-                  {
-                    ind++;
-                    if (ind >= objetosLista.Count)
-                      ind = 0;
-                    break;
-                  }
-                  ind++;
-                }
-                objetoSelecionado = objetosLista[ind];
-              }
-            }
-            else
-            {
-              if (input.IsKeyPressed(Keys.C))
-              {
-                objetoSelecionado.shaderCor = new Shader("Shaders/shader.vert", "Shaders/shaderCiano.frag");
-              }
-            }
-          }
-        }
+      if (input.IsKeyPressed(Keys.Space)) {
+          //
+      } else if (input.IsKeyPressed(Keys.C)) {
+          //
+      } else if (input.IsKeyPressed(Keys.B)) {
+          //
+      } else if (input.IsKeyPressed(Keys.E)) {
+          //
+      } else if (input.IsKeyPressed(Keys.D)) {
+          //
       }
       #endregion
-
-      #region  Mouse
-      var mouse = MouseState;
-      // Mouse FIXME: inverte eixo Y, fazer NDC para proporção em tela
-      Vector2i janela = this.ClientRectangle.Size;
-
-      if (input.IsKeyDown(Keys.LeftShift))
-      {
-        if (_firstMove)
-        {
-          _lastPos = new Vector2(mouse.X, mouse.Y);
-          _firstMove = false;
-        }
-        else
-        {
-          var deltaX = (mouse.X - _lastPos.X) / janela.X;
-          var deltaY = (mouse.Y - _lastPos.Y) / janela.Y;
-          _lastPos = new Vector2(mouse.X, mouse.Y);
-
-          objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + deltaX, objetoSelecionado.PontosId(0).Y + deltaY, 0), 0);
-          objetoSelecionado.ObjetoAtualizar();
-        }
-      }
-      if (input.IsKeyDown(Keys.RightShift))
-      {
-        objetoSelecionado.PontosAlterar(new Ponto4D(mouse.X / janela.X, mouse.Y / janela.Y, 0), 0);
-        objetoSelecionado.ObjetoAtualizar();
-      }
-      #endregion
-
     }
 
     protected override void OnResize(ResizeEventArgs e)
