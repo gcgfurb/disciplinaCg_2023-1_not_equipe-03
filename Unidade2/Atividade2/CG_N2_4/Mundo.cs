@@ -20,8 +20,10 @@ namespace gcgcg
   {
     private List<Objeto> objetosLista = new List<Objeto>();
     private List<Objeto> retas = new List<Objeto>();
+    private List<Ponto4D> pontos = new List<Ponto4D>();
     private Objeto objetoSelecionado = null;
     private Objeto primeiroPonto = null;
+    private Spline s = null;
     private Dictionary<Objeto, Objeto> reta = new Dictionary<Objeto, Objeto>();
     private char rotulo = '@';
 
@@ -89,9 +91,11 @@ namespace gcgcg
       #region Poliedro
       // Criando os pontos
       ponto = new Ponto(null, new Ponto4D(-0.5, -0.5));
+      pontos.Add(ponto.PontosId(0));
       ObjetoNovo(ponto);
 
       ponto = new Ponto(ponto, new Ponto4D(-0.5, 0.5));
+      pontos.Add(ponto.PontosId(0));
       ObjetoNovo(ponto);
 
       reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
@@ -99,6 +103,7 @@ namespace gcgcg
       ObjetoNovo(reta);
 
       ponto = new Ponto(ponto, new Ponto4D(0.5, 0.5));
+      pontos.Add(ponto.PontosId(0));
       ObjetoNovo(ponto);
 
       reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
@@ -106,20 +111,22 @@ namespace gcgcg
       ObjetoNovo(reta);
 
       ponto = new Ponto(ponto, new Ponto4D(0.5, -0.5));
+      pontos.Add(ponto.PontosId(0));
       primeiroPonto = ponto;
       ObjetoNovo(ponto);
 
       reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
       retas.Add(reta);
       ObjetoNovo(reta);
-
-      objetoSelecionado = ponto; 
       #endregion
 
       #region spline
-      //
+      s = new Spline(null, pontos, 10);
+      s.desenhaSpline();
+      ObjetoNovo(s);
       #endregion
 
+      objetoSelecionado = ponto; 
 
       // -------------------------------------------------
 
@@ -223,6 +230,46 @@ namespace gcgcg
                 }
             }
         }
+        
+        // Recalcula Spline
+        s.desenhaSpline();
+        s.ObjetoAtualizar();
+    }
+
+    private void ptosPosOriginal() {
+        // Primeiro Ponto
+        objetosLista[0].PontosId(0).X = -0.5;
+        objetosLista[0].PontosId(0).Y = -0.5; 
+        // Segundo Ponto
+        objetosLista[1].PontosId(0).X = -0.5;
+        objetosLista[1].PontosId(0).Y = 0.5;
+        // Primeira Reta
+        objetosLista[2].PontosAlterar(objetosLista[0].PontosId(0), 0);
+        objetosLista[2].PontosAlterar(objetosLista[1].PontosId(0), 1);
+        // Atualizando objetos
+        objetosLista[2].ObjetoAtualizar();
+        objetosLista[0].ObjetoAtualizar();
+        objetosLista[1].ObjetoAtualizar();
+
+        // Terceiro Ponto
+        objetosLista[3].PontosId(0).X = 0.5;
+        objetosLista[3].PontosId(0).Y = 0.5;
+        // Segunda Reta
+        objetosLista[4].PontosAlterar(objetosLista[1].PontosId(0), 0);
+        objetosLista[4].PontosAlterar(objetosLista[3].PontosId(0), 1);
+        // Atualizando objetos
+        objetosLista[3].ObjetoAtualizar();
+        objetosLista[4].ObjetoAtualizar();
+
+        // Quarto Ponto
+        objetosLista[5].PontosId(0).X = 0.5;
+        objetosLista[5].PontosId(0).Y = -0.5;
+        // Terceira Reta
+        objetosLista[6].PontosAlterar(objetosLista[3].PontosId(0), 0);
+        objetosLista[6].PontosAlterar(objetosLista[5].PontosId(0), 1);
+        // Atualizando objetos
+        objetosLista[5].ObjetoAtualizar();
+        objetosLista[6].ObjetoAtualizar();
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -231,6 +278,7 @@ namespace gcgcg
 
       #region Teclado
       var input = KeyboardState;
+      
       if (input.IsKeyPressed(Keys.Space)) {
           objetoSelecionado = objetoSelecionado.PaiRef;
           if (objetoSelecionado == null)
@@ -243,6 +291,19 @@ namespace gcgcg
           atualizaForma(objetoSelecionado, 'E');
       } else if (input.IsKeyPressed(Keys.D)) {
           atualizaForma(objetoSelecionado, 'D');
+      } else if (input.IsKeyPressed(Keys.KeyPadAdd)) {
+          s.qtdPontos += 1;
+          atualizaForma(objetoSelecionado, 'N');
+      } else if (input.IsKeyPressed(Keys.KeyPadSubtract)) {
+          if (s.qtdPontos > 1) {
+              s.qtdPontos -= 1;
+              atualizaForma(objetoSelecionado, 'N');
+          }
+      } else if (input.IsKeyPressed(Keys.R)) {
+          ptosPosOriginal();
+          s.qtdPontos = 10;
+          s.desenhaSpline();
+          s.ObjetoAtualizar();
       }
       #endregion
     }
