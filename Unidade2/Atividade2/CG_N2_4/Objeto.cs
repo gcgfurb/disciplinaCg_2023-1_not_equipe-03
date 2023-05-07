@@ -14,7 +14,7 @@ namespace gcgcg
     protected char rotulo;
     public char Rotulo { get => rotulo; set => rotulo = value; }
     protected Objeto paiRef;
-    // public Objeto PaiRef { get => paiRef; }
+    public Objeto PaiRef { get => paiRef; }
     private List<Objeto> objetosLista = new List<Objeto>();
     private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
     public PrimitiveType PrimitivaTipo { get => primitivaTipo; set => primitivaTipo = value; }

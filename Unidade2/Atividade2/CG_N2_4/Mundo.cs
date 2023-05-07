@@ -19,8 +19,10 @@ namespace gcgcg
   public class Mundo : GameWindow
   {
     private List<Objeto> objetosLista = new List<Objeto>();
+    private List<Objeto> retas = new List<Objeto>();
     private Objeto objetoSelecionado = null;
-    private Objeto objAtual = null;
+    private Objeto primeiroPonto = null;
+    private Dictionary<Objeto, Objeto> reta = new Dictionary<Objeto, Objeto>();
     private char rotulo = '@';
 
     private readonly float[] _sruEixos =
@@ -81,26 +83,37 @@ namespace gcgcg
       _shaderVerde = new Shader("Shaders/shader.vert", "Shaders/shaderVerde.frag");
       _shaderAzul = new Shader("Shaders/shader.vert", "Shaders/shaderAzul.frag");
 
-      Objeto objetoNovo = null;
+      Objeto ponto = null;
+      Objeto reta = null;
 
       #region Poliedro
-      // Pontos
-      objetoNovo = new Ponto(null, new Ponto4D(-0.5, -0.5));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      objetoNovo = new Ponto(null, new Ponto4D(-0.5, 0.5));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      objetoNovo = new Ponto(null, new Ponto4D(0.5, 0.5));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      objetoNovo = new Ponto(null, new Ponto4D(0.5, -0.5));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
+      // Criando os pontos
+      ponto = new Ponto(null, new Ponto4D(-0.5, -0.5));
+      ObjetoNovo(ponto);
 
-      // Retas
-      objetoNovo = new SegReta(null, objetosLista[0].PontosId(0), objetosLista[1].PontosId(0));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      objetoNovo = new SegReta(null, objetosLista[1].PontosId(0), objetosLista[2].PontosId(0));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      objetoNovo = new SegReta(null, objetosLista[2].PontosId(0), objetosLista[3].PontosId(0));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
+      ponto = new Ponto(ponto, new Ponto4D(-0.5, 0.5));
+      ObjetoNovo(ponto);
+
+      reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
+      retas.Add(reta);
+      ObjetoNovo(reta);
+
+      ponto = new Ponto(ponto, new Ponto4D(0.5, 0.5));
+      ObjetoNovo(ponto);
+
+      reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
+      retas.Add(reta);
+      ObjetoNovo(reta);
+
+      ponto = new Ponto(ponto, new Ponto4D(0.5, -0.5));
+      primeiroPonto = ponto;
+      ObjetoNovo(ponto);
+
+      reta = new SegReta(null, ponto.PaiRef.PontosId(0), ponto.PontosId(0));
+      retas.Add(reta);
+      ObjetoNovo(reta);
+
+      objetoSelecionado = ponto; 
       #endregion
 
       #region spline
@@ -159,6 +172,59 @@ namespace gcgcg
       SwapBuffers();
     }
 
+    private void atualizaForma(Objeto ponto, char direcao) {
+        bool alterado = false;
+
+        foreach (Objeto r in retas) {
+            for (int i = 0; i < 2; i++) {
+                if (r.PontosId(i) == ponto.PontosId(0)) {
+                    switch(direcao) {
+                        case 'C':
+                            if (!alterado) {
+                                ponto.PontosId(0).Y += 0.05;
+                                alterado = true;
+                            }
+                            r.PontosAlterar(ponto.PontosId(0), i);
+
+                            r.ObjetoAtualizar();
+                            ponto.ObjetoAtualizar();
+                            break;
+                        case 'B':
+                            if (!alterado) {
+                                ponto.PontosId(0).Y -= 0.05;
+                                alterado = true;
+                            }
+                            r.PontosAlterar(ponto.PontosId(0), i);
+
+                            r.ObjetoAtualizar();
+                            ponto.ObjetoAtualizar();
+                            break;
+                        case 'E':
+                            if (!alterado) {
+                                ponto.PontosId(0).X -= 0.05;
+                                alterado = true;
+                            }
+                            r.PontosAlterar(ponto.PontosId(0), i);
+
+                            r.ObjetoAtualizar();
+                            ponto.ObjetoAtualizar();
+                            break;
+                        case 'D':
+                            if (!alterado) {
+                                ponto.PontosId(0).X += 0.05;
+                                alterado = true;
+                            }
+                            r.PontosAlterar(ponto.PontosId(0), i);
+
+                            r.ObjetoAtualizar();
+                            ponto.ObjetoAtualizar();
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
       base.OnUpdateFrame(e);
@@ -166,15 +232,17 @@ namespace gcgcg
       #region Teclado
       var input = KeyboardState;
       if (input.IsKeyPressed(Keys.Space)) {
-          //
+          objetoSelecionado = objetoSelecionado.PaiRef;
+          if (objetoSelecionado == null)
+              objetoSelecionado = primeiroPonto;
       } else if (input.IsKeyPressed(Keys.C)) {
-          //
+          atualizaForma(objetoSelecionado, 'C');
       } else if (input.IsKeyPressed(Keys.B)) {
-          //
+          atualizaForma(objetoSelecionado, 'B');
       } else if (input.IsKeyPressed(Keys.E)) {
-          //
+          atualizaForma(objetoSelecionado, 'E');
       } else if (input.IsKeyPressed(Keys.D)) {
-          //
+          atualizaForma(objetoSelecionado, 'D');
       }
       #endregion
     }
