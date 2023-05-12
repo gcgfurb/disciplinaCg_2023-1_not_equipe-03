@@ -131,40 +131,6 @@ namespace gcgcg
       criaBBox();
       #endregion
 
-      /*
-      #region Objeto: polígono qualquer  
-      objetoNovo = new Poligono(null);
-      objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.25));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.25));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.75, 0.75));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.50, 0.50));
-      objetoNovo.PontosAdicionar(new Ponto4D(0.25, 0.75));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      #endregion
-      #region NÃO USAR: declara um objeto filho ao polígono
-      objetoNovo = new Ponto(null, new Ponto4D(0.50, 0.75));
-      ObjetoNovo(objetosLista[0], objetoNovo); objetoNovo = null;
-      #endregion
-
-      #region Objeto: retângulo  
-      objetoNovo = new Retangulo(null, new Ponto4D(-0.25, 0.25), new Ponto4D(-0.75, 0.75));
-      objetoNovo.PrimitivaTipo = PrimitiveType.LineLoop;
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      #endregion
-
-      #region Objeto: segmento de reta  
-      objetoNovo = new SegReta(null, new Ponto4D(-0.25, -0.25), new Ponto4D(-0.75, -0.75));
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      #endregion
-
-      #region Objeto: ponto  
-      objetoNovo = new Ponto(null, new Ponto4D(0.25, -0.25));
-      objetoNovo.PrimitivaTipo = PrimitiveType.Points;
-      objetoNovo.PrimitivaTamanho = 10;
-      ObjetoNovo(objetoNovo); objetoNovo = null;
-      #endregion
-      */
-
 #if CG_Privado
       #region Objeto: circulo  
       objetoNovo = new Circulo(null, 0.2, new Ponto4D());
@@ -202,20 +168,16 @@ namespace gcgcg
       SwapBuffers();
     }
 
-    private bool testeCircMaior() {
+    private bool passouCircMaior() {
         Circulo c = (Circulo) CircMaior[0];
         Ponto p = (Ponto) CircMenor[1];
 
         double dist = 0;
         for (int i = 0; i < 72; i++) {
-            dist = Math.Pow(c.PontosId(i).X - p.PontosId(0).X, 2);
-            Console.WriteLine("Só X: " + dist);
-            dist += Math.Pow(c.PontosId(i).Y - p.PontosId(0).Y, 2);
-            Console.WriteLine(dist);
-            if (dist == 0)
+            dist = Math.Pow(p.PontosId(0).X - c.PontosId(i).X, 2);
+            dist += Math.Pow(p.PontosId(0).Y - c.PontosId(i).Y, 2);
+            if (dist >= 0.35)
                 return true;
-
-                // TODO: Ainda não tá funcionando.
         }
 
         return false;
@@ -248,48 +210,44 @@ namespace gcgcg
         Circulo c = (Circulo) CircMenor[0];
         Ponto p = (Ponto) CircMenor[1];
 
-        if (testeCircMaior())
-            return;
-
         switch(direcao) {
             case 'C':
                 c.centroY += 0.01;
-                c.desenhaCirc();
-                c.ObjetoAtualizar();
-
-                // Atualiza Ponto central.
                 p.PontosId(0).Y += 0.01;
-                p.ObjetoAtualizar();
+                if (passouCircMaior()) {
+                    c.centroY -= 0.01;
+                    p.PontosId(0).Y -= 0.01;
+                }
                 break;
             case 'B':
                 c.centroY -= 0.01;
-                c.desenhaCirc();
-                c.ObjetoAtualizar();
-
-                // Atualiza Ponto central.
                 p.PontosId(0).Y -= 0.01;
-                p.ObjetoAtualizar();
+                if (passouCircMaior()) {
+                    c.centroY += 0.01;
+                    p.PontosId(0).Y += 0.01;
+                }
                 break;
             case 'E':
                 c.centroX -= 0.01;
-                c.desenhaCirc();
-                c.ObjetoAtualizar();
-
-                // Atualiza Ponto central.
                 p.PontosId(0).X -= 0.01;
-                p.ObjetoAtualizar();
+                if (passouCircMaior()) {
+                    c.centroX += 0.01;
+                    p.PontosId(0).X += 0.01;
+                }
                 break;
             case 'D':
-                c = (Circulo) CircMenor[0];
                 c.centroX += 0.01;
-                c.desenhaCirc();
-                c.ObjetoAtualizar();
-
-                // Atualiza Ponto central.
                 p.PontosId(0).X += 0.01;
-                p.ObjetoAtualizar();
+                if (passouCircMaior()) {
+                    c.centroX -= 0.01;
+                    p.PontosId(0).X -= 0.01;
+                }
                 break;
         }
+
+        c.desenhaCirc();
+        c.ObjetoAtualizar();
+        p.ObjetoAtualizar();
 
         testeBBox();
     }

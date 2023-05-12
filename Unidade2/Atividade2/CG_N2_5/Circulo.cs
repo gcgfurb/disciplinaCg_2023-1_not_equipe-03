@@ -32,7 +32,7 @@ namespace gcgcg
       }
     }
 
-    public void desenhaCirc(double raio, double centroX, double centro) {
+    public void desenhaCirc(double raio, double centroX, double centroY) {
         base.pontosLista.Clear();
         for (int i = 0; i < 360; i += 5) {
             Ponto4D ponto = new Ponto4D(Matematica.GerarPtosCirculo(i, raio));
