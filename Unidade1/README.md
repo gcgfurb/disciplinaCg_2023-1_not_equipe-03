@@ -16,7 +16,7 @@ Objetivo: identificar os conceitos gerais da Computação Gráfica e as principa
 ## [Atividades - Aula](Atividade1/README.md "Atividades - Aula")  
 
 <!-- 
-TODO:
+TODO:  
 Pedir para cada aluno escolher uma única palavra que representa o assunto apresentando, que pode estar ou não no material mostrado.
 -->
 
