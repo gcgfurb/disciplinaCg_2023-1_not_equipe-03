@@ -21,6 +21,7 @@ namespace gcgcg
     Objeto mundo;
     private char rotuloAtual = '?';
     private Objeto objetoSelecionado = null;
+    private List<Objeto> listaPoligonos = new List<Objeto>();
 
     private readonly float[] _sruEixos =
     {
@@ -87,13 +88,13 @@ namespace gcgcg
       #endregion
 
       // #region Objeto: polígono qualquer  
-      List<Ponto4D> pontosPoligono = new List<Ponto4D>();
-      pontosPoligono.Add(new Ponto4D(0.25, 0.25));
-      pontosPoligono.Add(new Ponto4D(0.75, 0.25));
-      pontosPoligono.Add(new Ponto4D(0.75, 0.75));
-      pontosPoligono.Add(new Ponto4D(0.50, 0.50));
-      pontosPoligono.Add(new Ponto4D(0.25, 0.75));
-      objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
+      // List<Ponto4D> pontosPoligono = new List<Ponto4D>();
+      // pontosPoligono.Add(new Ponto4D(0.25, 0.25));
+      // pontosPoligono.Add(new Ponto4D(0.75, 0.25));
+      // pontosPoligono.Add(new Ponto4D(0.75, 0.75));
+      // pontosPoligono.Add(new Ponto4D(0.50, 0.50));
+      // pontosPoligono.Add(new Ponto4D(0.25, 0.75));
+      // objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
       // #endregion
       // #region NÃO USAR: declara um objeto filho ao polígono
       // objetoSelecionado = new Ponto(objetoSelecionado, ref rotuloAtual, new Ponto4D(0.50, 0.75));
@@ -106,7 +107,7 @@ namespace gcgcg
       // #endregion
 
       #region Objeto: segmento de reta  
-      objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.5, -0.5), new Ponto4D());
+      // objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.5, -0.5), new Ponto4D());
       #endregion
 
       // #region Objeto: ponto  
@@ -145,106 +146,61 @@ namespace gcgcg
       SwapBuffers();
     }
 
+    protected Ponto4D pontoFormatado(Vector2 posMouse, Vector2i janela) {
+        float x, y;
+
+        // Solução p/ as posições do mouse encontrada em:
+        //     https://community.khronos.org/t/opentk-drawing-points-by-mouse-click/75583/4
+
+        // Retorna um valor entre -1 e 1.
+        // Parece que o cálculo tenta ajustar as coordenadas de MouseState
+        // para essa escala.
+
+        // TODO: Pedir explicação
+        x = (posMouse.X - janela.X / 2f) / (janela.X / 2f);
+        y = -(posMouse.Y - janela.Y / 2f) / (janela.Y / 2f);
+
+        return new Ponto4D(x, y);
+    }
+
+    protected void manipulaPoligono(Ponto4D novoPonto) {
+        if (objetoSelecionado == null) {
+            List<Ponto4D> primeiroPto = new List<Ponto4D>();
+            primeiroPto.Add(novoPonto);
+            objetoSelecionado = new Poligono(mundo, ref rotuloAtual, primeiroPto);
+        }
+
+        if (novoPonto == null) {
+            // Pressionou ENTER, finaliza a criação do polígono.
+            listaPoligonos.Add(objetoSelecionado);
+            objetoSelecionado = null;
+        } else {      
+            objetoSelecionado.PontosAdicionar(novoPonto);
+            objetoSelecionado.ObjetoAtualizar();
+        }
+            
+    }
+
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
       base.OnUpdateFrame(e);
 
       // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc
       #region Teclado
-      var input = KeyboardState;
-      if (input.IsKeyDown(Keys.Escape))
-      {
-        Close();
-      }
-      else
-      {
-        if (input.IsKeyPressed(Keys.G))
-        {
-          mundo.GrafocenaImprimir("");
-        }
-        else
-        {
-          if (input.IsKeyPressed(Keys.P))
-          {
-            System.Console.WriteLine(objetoSelecionado.ToString());
-          }
-          else
-          {
-            if (input.IsKeyPressed(Keys.M))
-              objetoSelecionado.MatrizImprimir();
-            else
-            {
-              //TODO: não está atualizando a BBox com as transformações geométricas
-              if (input.IsKeyPressed(Keys.I))
-                objetoSelecionado.MatrizAtribuirIdentidade();
-              else
-              {
-                if (input.IsKeyPressed(Keys.Left))
-                  objetoSelecionado.MatrizTranslacaoXYZ(-0.05, 0, 0);
-                else
-                {
-                  if (input.IsKeyPressed(Keys.Right))
-                    objetoSelecionado.MatrizTranslacaoXYZ(0.05, 0, 0);
-                  else
-                  {
-                    if (input.IsKeyPressed(Keys.Up))
-                      objetoSelecionado.MatrizTranslacaoXYZ(0, 0.05, 0);
-                    else
-                    {
-                      if (input.IsKeyPressed(Keys.Down))
-                        objetoSelecionado.MatrizTranslacaoXYZ(0, -0.05, 0);
-                      else
-                      {
-                        if (input.IsKeyPressed(Keys.PageUp))
-                          objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
-                        else
-                        {
-                          if (input.IsKeyPressed(Keys.PageDown))
-                            objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
-                          else
-                          {
-                            if (input.IsKeyPressed(Keys.Home))
-                              objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
-                            else
-                            {
-                              if (input.IsKeyPressed(Keys.End))
-                                objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
-                              else
-                              {
-                                if (input.IsKeyPressed(Keys.D1))
-                                  objetoSelecionado.MatrizRotacao(10);
-                                else
-                                {
-                                  if (input.IsKeyPressed(Keys.D2))
-                                    objetoSelecionado.MatrizRotacao(-10);
-                                  else
-                                  {
-                                    if (input.IsKeyPressed(Keys.D3))
-                                      objetoSelecionado.MatrizRotacaoZBBox(10);
-                                    else
-                                    {
-                                      if (input.IsKeyPressed(Keys.D4))
-                                        objetoSelecionado.MatrizRotacaoZBBox(-10);
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      var teclado = KeyboardState;
+
+      if (teclado.IsKeyPressed(Keys.Enter))
+          manipulaPoligono(null);
       #endregion
 
       #region  Mouse
-      // ☞ cc6efca2-aba0-4a49-b49e-d8e937028d26
+      var mouse = MouseState;
+
+      Ponto4D novoPonto = null;
+      if (mouse.IsButtonPressed(MouseButton.Left)) {          
+          novoPonto = pontoFormatado(mouse.Position, this.ClientRectangle.Size);
+          manipulaPoligono(novoPonto);
+      }
       #endregion
 
     }
