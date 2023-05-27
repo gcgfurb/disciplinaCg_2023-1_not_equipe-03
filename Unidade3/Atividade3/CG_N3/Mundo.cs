@@ -20,8 +20,9 @@ namespace gcgcg
   {
     Objeto mundo;
     private char rotuloAtual = '?';
-    private Objeto objetoSelecionado = null;
+    private Objeto poligonoSelecionado = null;
     private List<Objeto> listaPoligonos = new List<Objeto>();
+    private Shader corPadrao;
 
     private readonly float[] _sruEixos =
     {
@@ -36,6 +37,8 @@ namespace gcgcg
     private Shader _shaderVermelha;
     private Shader _shaderVerde;
     private Shader _shaderAzul;
+    private Shader _shaderAmarela;
+    private Shader _shaderBranca;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -85,7 +88,11 @@ namespace gcgcg
       _shaderVermelha = new Shader("Shaders/shader.vert", "Shaders/shaderVermelha.frag");
       _shaderVerde = new Shader("Shaders/shader.vert", "Shaders/shaderVerde.frag");
       _shaderAzul = new Shader("Shaders/shader.vert", "Shaders/shaderAzul.frag");
+      _shaderAmarela = new Shader("Shaders/shader.vert", "Shaders/shaderAmarela.frag");
+      _shaderBranca = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
       #endregion
+
+      corPadrao = _shaderAmarela;
 
       // #region Objeto: polígono qualquer  
       // List<Ponto4D> pontosPoligono = new List<Ponto4D>();
@@ -146,40 +153,74 @@ namespace gcgcg
       SwapBuffers();
     }
 
-    protected Ponto4D pontoFormatado(Vector2 posMouse, Vector2i janela) {
-        float x, y;
+    #region codigoAtividades
+    protected Ponto4D pontoFormatado() {
+        int janelaLargura = Size.X;
+        int janelaAltura = Size.Y;
 
-        // Solução p/ as posições do mouse encontrada em:
-        //     https://community.khronos.org/t/opentk-drawing-points-by-mouse-click/75583/4
+        Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
+        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
 
-        // Retorna um valor entre -1 e 1.
-        // Parece que o cálculo tenta ajustar as coordenadas de MouseState
-        // para essa escala.
-
-        // TODO: Pedir explicação
-        x = (posMouse.X - janela.X / 2f) / (janela.X / 2f);
-        y = -(posMouse.Y - janela.Y / 2f) / (janela.Y / 2f);
-
-        return new Ponto4D(x, y);
+        return sruPonto;
     }
 
-    protected void manipulaPoligono(Ponto4D novoPonto) {
-        if (objetoSelecionado == null) {
-            List<Ponto4D> primeiroPto = new List<Ponto4D>();
-            primeiroPto.Add(novoPonto);
-            objetoSelecionado = new Poligono(mundo, ref rotuloAtual, primeiroPto);
-        }
+    protected void manipulaPoligono(Ponto4D novoPonto, bool finaliza = false) {
+        if (finaliza) {
+            if (poligonoSelecionado == null || listaPoligonos.Contains(poligonoSelecionado))
+                return;
 
-        if (novoPonto == null) {
-            // Pressionou ENTER, finaliza a criação do polígono.
-            listaPoligonos.Add(objetoSelecionado);
-            objetoSelecionado = null;
-        } else {      
-            objetoSelecionado.PontosAdicionar(novoPonto);
-            objetoSelecionado.ObjetoAtualizar();
+            listaPoligonos.Add(poligonoSelecionado);
+        } else {
+            if (novoPonto == null)
+                return;
+
+            if (poligonoSelecionado == null)
+                poligonoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
+            else {
+                if (listaPoligonos.Contains(poligonoSelecionado)) {
+                    poligonoSelecionado.shaderCor = _shaderBranca;
+                    poligonoSelecionado.ObjetoAtualizar();
+
+                    poligonoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
+                } else {
+                    poligonoSelecionado.PontosAdicionar(novoPonto);
+                }
+            }
+
+            poligonoSelecionado.shaderCor = corPadrao;
+            poligonoSelecionado.ObjetoAtualizar();
         }
+    }
+
+    protected void proximoPoligono() {
+        if (listaPoligonos.Count < 1)
+            return;
             
+        poligonoSelecionado.shaderCor = _shaderBranca;
+        poligonoSelecionado.ObjetoAtualizar();
+
+        int nextPos = (listaPoligonos.IndexOf(poligonoSelecionado) + 1) % listaPoligonos.Count;
+        poligonoSelecionado = listaPoligonos[nextPos];
+        poligonoSelecionado.shaderCor = corPadrao;
+        poligonoSelecionado.ObjetoAtualizar();
     }
+
+    protected void deletaPoligono() {
+        /*if (listaPoligonos.Count == 0)
+            return;
+
+        Objeto poligonoDeletar = poligonoSelecionado;
+        proximoPoligono();
+
+        listaPoligonos.Remove(poligonoDeletar);
+        poligonoDeletar.ObjetoAtualizar();*/
+
+        // AINDA NÃO FUNCIONA
+    }
+    protected void deletaVerticePoligono() {
+        // TBM NÃO FUNCIONA
+    }
+    #endregion
 
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
@@ -190,7 +231,46 @@ namespace gcgcg
       var teclado = KeyboardState;
 
       if (teclado.IsKeyPressed(Keys.Enter))
-          manipulaPoligono(null);
+          manipulaPoligono(null, true);
+
+      if (teclado.IsKeyPressed(Keys.D))
+          deletaPoligono();
+
+      if (teclado.IsKeyPressed(Keys.Space))
+          proximoPoligono();
+
+      if (teclado.IsKeyPressed(Keys.E))
+          deletaVerticePoligono();
+
+      if (teclado.IsKeyPressed(Keys.P) && poligonoSelecionado != null) {
+          if (poligonoSelecionado.PrimitivaTipo == PrimitiveType.LineLoop)
+              poligonoSelecionado.PrimitivaTipo = PrimitiveType.LineStrip;
+          else
+              poligonoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
+
+          poligonoSelecionado.ObjetoAtualizar();
+      }
+
+      if (teclado.IsKeyPressed(Keys.R)) {
+          corPadrao = _shaderVermelha;
+
+          poligonoSelecionado.shaderCor = corPadrao;
+          poligonoSelecionado.ObjetoAtualizar();
+      }
+
+      if (teclado.IsKeyPressed(Keys.G)) {
+          corPadrao = _shaderVerde;
+
+          poligonoSelecionado.shaderCor = corPadrao;
+          poligonoSelecionado.ObjetoAtualizar();
+      }
+
+      if (teclado.IsKeyPressed(Keys.B)) {
+          corPadrao = _shaderAzul;
+
+          poligonoSelecionado.shaderCor = corPadrao;
+          poligonoSelecionado.ObjetoAtualizar();
+      }    
       #endregion
 
       #region  Mouse
@@ -198,11 +278,17 @@ namespace gcgcg
 
       Ponto4D novoPonto = null;
       if (mouse.IsButtonPressed(MouseButton.Left)) {          
-          novoPonto = pontoFormatado(mouse.Position, this.ClientRectangle.Size);
+          novoPonto = pontoFormatado();
           manipulaPoligono(novoPonto);
       }
-      #endregion
 
+      if (mouse.IsButtonDown(MouseButton.Right) && (poligonoSelecionado != null)) {
+          novoPonto = pontoFormatado();
+
+          poligonoSelecionado.PontosAlterar(novoPonto, 0);
+          poligonoSelecionado.ObjetoAtualizar();
+      }
+      #endregion
     }
 
     protected override void OnResize(ResizeEventArgs e)
