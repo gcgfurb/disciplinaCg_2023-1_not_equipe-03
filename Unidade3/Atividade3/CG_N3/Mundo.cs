@@ -92,7 +92,7 @@ namespace gcgcg
       _shaderBranca = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
       #endregion
 
-      corPadrao = _shaderAmarela;
+      corPadrao = _shaderVermelha;
 
       // #region Objeto: polígono qualquer  
       // List<Ponto4D> pontosPoligono = new List<Ponto4D>();
@@ -217,8 +217,19 @@ namespace gcgcg
 
         // AINDA NÃO FUNCIONA
     }
+
     protected void deletaVerticePoligono() {
         // TBM NÃO FUNCIONA
+    }
+
+    protected void selecionaPoligonoBbox() {
+        Ponto4D posMouse = pontoFormatado();
+
+        /*if (Matematica.Dentro(poligonoSelecionado.Bbox, posMouse)) {
+            if (Matematica.scanLine()) {
+                // Desenha Bbox
+            }
+        }*/
     }
     #endregion
 
@@ -270,7 +281,10 @@ namespace gcgcg
 
           poligonoSelecionado.shaderCor = corPadrao;
           poligonoSelecionado.ObjetoAtualizar();
-      }    
+      }
+
+      if (teclado.IsKeyPressed(Keys.S))
+          selecionaPoligonoBbox();
       #endregion
 
       #region  Mouse
