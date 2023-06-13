@@ -20,7 +20,7 @@ namespace gcgcg
   {
     Objeto mundo;
     private char rotuloAtual = '?';
-    private Objeto poligonoSelecionado = null;
+    private Objeto objetoSelecionado = null;
     private List<Objeto> listaPoligonos = new List<Objeto>();
     private Shader corPadrao;
 
@@ -93,51 +93,6 @@ namespace gcgcg
       #endregion
 
       corPadrao = _shaderVermelha;
-
-      // #region Objeto: polígono qualquer  
-      // List<Ponto4D> pontosPoligono = new List<Ponto4D>();
-      // pontosPoligono.Add(new Ponto4D(0.25, 0.25));
-      // pontosPoligono.Add(new Ponto4D(0.75, 0.25));
-      // pontosPoligono.Add(new Ponto4D(0.75, 0.75));
-      // pontosPoligono.Add(new Ponto4D(0.50, 0.50));
-      // pontosPoligono.Add(new Ponto4D(0.25, 0.75));
-      // objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
-      // #endregion
-      // #region NÃO USAR: declara um objeto filho ao polígono
-      // objetoSelecionado = new Ponto(objetoSelecionado, ref rotuloAtual, new Ponto4D(0.50, 0.75));
-      // objetoSelecionado.ToString();
-      // #endregion
-
-      // #region Objeto: retângulo  
-      // objetoSelecionado = new Retangulo(mundo, ref rotuloAtual, new Ponto4D(-0.25, 0.25), new Ponto4D(-0.75, 0.75));
-      // objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
-      // #endregion
-
-      #region Objeto: segmento de reta  
-      // objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.5, -0.5), new Ponto4D());
-      #endregion
-
-      // #region Objeto: ponto  
-      // objetoSelecionado = new Ponto(mundo, ref rotuloAtual, new Ponto4D(-0.25, -0.25));
-      // objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
-      // objetoSelecionado.PrimitivaTamanho = 5; // FIXME: não está mudando o tamanho
-      // #endregion
-
-#if CG_Privado
-      // #region Objeto: circulo  
-      // objetoSelecionado = new Circulo(mundo, ref rotuloAtual, 0.2, new Ponto4D());
-      // objetoSelecionado.shaderCor = new Shader("Shaders/shader.vert", "Shaders/shaderAmarela.frag");
-      // #endregion
-
-      // #region Objeto: SrPalito  
-      // objetoSelecionado = new SrPalito(mundo, ref rotuloAtual);
-      // #endregion
-
-      // #region Objeto: Spline
-      // objetoSelecionado = new Spline(mundo, ref rotuloAtual);
-      // #endregion
-#endif
-
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -154,154 +109,229 @@ namespace gcgcg
     }
 
     #region codigoAtividades
-    protected Ponto4D pontoFormatado() {
+    protected Ponto4D pontoClick() {
         int janelaLargura = Size.X;
         int janelaAltura = Size.Y;
 
-        Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
-        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
+        Ponto4D ponto = new Ponto4D(MousePosition.X, MousePosition.Y);
+        ponto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, ponto);
 
-        return sruPonto;
+        return ponto;
     }
 
-    protected void manipulaPoligono(Ponto4D novoPonto, bool finaliza = false) {
+    // Questão 2
+    protected void criaPoligono(Ponto4D novoPonto, bool finaliza = false) {
         if (finaliza) {
-            if (poligonoSelecionado == null || listaPoligonos.Contains(poligonoSelecionado))
+            if (objetoSelecionado == null || listaPoligonos.Contains(objetoSelecionado))
                 return;
 
-            listaPoligonos.Add(poligonoSelecionado);
+            listaPoligonos.Add(objetoSelecionado);
         } else {
             if (novoPonto == null)
                 return;
 
-            if (poligonoSelecionado == null)
-                poligonoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
+            if (objetoSelecionado == null)
+                objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
             else {
-                if (listaPoligonos.Contains(poligonoSelecionado)) {
-                    poligonoSelecionado.shaderCor = _shaderBranca;
-                    poligonoSelecionado.ObjetoAtualizar();
+                if (listaPoligonos.Contains(objetoSelecionado)) {
+                    objetoSelecionado.shaderCor = _shaderBranca;
+                    objetoSelecionado.ObjetoAtualizar();
 
-                    poligonoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
+                    objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
                 } else {
-                    poligonoSelecionado.PontosAdicionar(novoPonto);
+                    objetoSelecionado.PontosAdicionar(novoPonto);
                 }
             }
 
-            poligonoSelecionado.shaderCor = corPadrao;
-            poligonoSelecionado.ObjetoAtualizar();
+            objetoSelecionado.shaderCor = corPadrao;
+            objetoSelecionado.ObjetoAtualizar();
         }
     }
 
     protected void proximoPoligono() {
-        if (listaPoligonos.Count < 1)
+        if (listaPoligonos.Count == 0) {
+            objetoSelecionado = null;
             return;
-            
-        poligonoSelecionado.shaderCor = _shaderBranca;
-        poligonoSelecionado.ObjetoAtualizar();
+        }
+        
+        // Objeto atual volta com a cor branca.    
+        objetoSelecionado.shaderCor = _shaderBranca;
+        objetoSelecionado.ObjetoAtualizar();
 
-        int nextPos = (listaPoligonos.IndexOf(poligonoSelecionado) + 1) % listaPoligonos.Count;
-        poligonoSelecionado = listaPoligonos[nextPos];
-        poligonoSelecionado.shaderCor = corPadrao;
-        poligonoSelecionado.ObjetoAtualizar();
+        int nextPos = 0;
+        if (objetoSelecionado != null)
+            nextPos = (listaPoligonos.IndexOf(objetoSelecionado) + 1) % listaPoligonos.Count;
+
+        objetoSelecionado = listaPoligonos[nextPos];
+        objetoSelecionado.shaderCor = corPadrao;
+        objetoSelecionado.ObjetoAtualizar();
     }
 
+    // Questão 3
     protected void deletaPoligono() {
-        /*if (listaPoligonos.Count == 0)
-            return;
-
-        Objeto poligonoDeletar = poligonoSelecionado;
+        Objeto objAtual = objetoSelecionado;
         proximoPoligono();
 
-        listaPoligonos.Remove(poligonoDeletar);
-        poligonoDeletar.ObjetoAtualizar();*/
+        listaPoligonos.Remove(objAtual);
 
-        // AINDA NÃO FUNCIONA
+        objetoSelecionado.deletaObjeto();
     }
 
-    protected void deletaVerticePoligono() {
-        // TBM NÃO FUNCIONA
-    }
+    // Questão 4
+    protected int selecionaVerticeProximo(Ponto4D posMouse) {
+        Poligono poligono = (Poligono) objetoSelecionado;
 
-    protected void selecionaPoligonoBbox() {
-        Ponto4D posMouse = pontoFormatado();
+        int qtdPtosPol = poligono.qtdPontos(), ptoSelecionado = -1;
+        double distPto = Int32.MaxValue;
 
-        /*if (Matematica.Dentro(poligonoSelecionado.Bbox, posMouse)) {
-            if (Matematica.scanLine()) {
-                // Desenha Bbox
+        for (int i = 0; i < qtdPtosPol; i++) {
+            if (Matematica.distancia(posMouse, poligono.PontosId(i)) < distPto) {
+                ptoSelecionado = i;
+                distPto = Matematica.distancia(posMouse, poligono.PontosId(i));
             }
-        }*/
+        }
+
+        return ptoSelecionado;
+    }
+
+    // Questão 5
+    protected void deletaVerticePoligono(Ponto4D posMouse) {
+        int id = selecionaVerticeProximo(posMouse);
+
+        Poligono p = (Poligono) objetoSelecionado;
+        if (p.qtdPontos() > 1)
+            objetoSelecionado.deletaVertice(id);
+        else
+            deletaPoligono();
+    }
+
+    protected bool scanLine(Ponto4D pontoMouse) {
+        Poligono P = (Poligono) objetoSelecionado;
+        for (int i = 0; i < P.qtdPontos() - 1; i++) {
+            if (P.PontosId(i).Y != P.PontosId(i + 1).Y) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    protected void selecionaPoligonoBbox(Ponto4D posMouse) {
+        foreach (Objeto poligono in listaPoligonos) {
+            if (Matematica.Dentro(poligono.Bbox(), posMouse)) {
+                if (Matematica.scanLine()) {
+                    // Desenha BBox
+                } else
+                    break;
+            }
+        }
     }
     #endregion
 
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
       base.OnUpdateFrame(e);
+      // Pega localização do click na tela.
+      Ponto4D pontoMouse = null;
 
-      // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc
+      #region Mouse
+      var mouse = MouseState;
+      // Questão 2
+      if (mouse.IsButtonPressed(MouseButton.Left)) {
+          pontoMouse = pontoClick();      
+          // Cria novo ponto para o polígono.
+          criaPoligono(pontoMouse);
+      }
+      
+      // Questão 4
+      if (mouse.IsButtonDown(MouseButton.Right) && (objetoSelecionado != null)) {
+          pontoMouse = pontoClick();          
+          // Seleciona qual o vérice mais próximo no polígono atual.
+          int idPontoProximo = selecionaVerticeProximo(pontoMouse);
+          objetoSelecionado.PontosAlterar(pontoMouse, idPontoProximo);
+          objetoSelecionado.ObjetoAtualizar();
+      }
+      #endregion
+
       #region Teclado
       var teclado = KeyboardState;
-
+      // Questão 2
       if (teclado.IsKeyPressed(Keys.Enter))
-          manipulaPoligono(null, true);
-
+          // Finaliza criação do polígono.
+          criaPoligono(null, true);
+      
+      // Questão 3
       if (teclado.IsKeyPressed(Keys.D))
           deletaPoligono();
 
       if (teclado.IsKeyPressed(Keys.Space))
           proximoPoligono();
 
-      if (teclado.IsKeyPressed(Keys.E))
-          deletaVerticePoligono();
-
-      if (teclado.IsKeyPressed(Keys.P) && poligonoSelecionado != null) {
-          if (poligonoSelecionado.PrimitivaTipo == PrimitiveType.LineLoop)
-              poligonoSelecionado.PrimitivaTipo = PrimitiveType.LineStrip;
-          else
-              poligonoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
-
-          poligonoSelecionado.ObjetoAtualizar();
+      // Questão 5
+      if (teclado.IsKeyPressed(Keys.E)) {
+          pontoMouse = pontoClick();
+          deletaVerticePoligono(pontoMouse);
       }
 
+      // Questão 7
+      if (teclado.IsKeyPressed(Keys.P) && objetoSelecionado != null) {
+          if (objetoSelecionado.PrimitivaTipo == PrimitiveType.LineLoop)
+              objetoSelecionado.PrimitivaTipo = PrimitiveType.LineStrip;
+          else
+              objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
+
+          objetoSelecionado.ObjetoAtualizar();
+      }
+      
+      // Questão 8
       if (teclado.IsKeyPressed(Keys.R)) {
           corPadrao = _shaderVermelha;
-
-          poligonoSelecionado.shaderCor = corPadrao;
-          poligonoSelecionado.ObjetoAtualizar();
+          objetoSelecionado.shaderCor = corPadrao;
+          objetoSelecionado.ObjetoAtualizar();
       }
 
+      // Questão 8
       if (teclado.IsKeyPressed(Keys.G)) {
           corPadrao = _shaderVerde;
-
-          poligonoSelecionado.shaderCor = corPadrao;
-          poligonoSelecionado.ObjetoAtualizar();
+          objetoSelecionado.shaderCor = corPadrao;
+          objetoSelecionado.ObjetoAtualizar();
       }
 
+      // Questão 8
       if (teclado.IsKeyPressed(Keys.B)) {
           corPadrao = _shaderAzul;
-
-          poligonoSelecionado.shaderCor = corPadrao;
-          poligonoSelecionado.ObjetoAtualizar();
+          objetoSelecionado.shaderCor = corPadrao;
+          objetoSelecionado.ObjetoAtualizar();
       }
 
-      if (teclado.IsKeyPressed(Keys.S))
-          selecionaPoligonoBbox();
-      #endregion
-
-      #region  Mouse
-      var mouse = MouseState;
-
-      Ponto4D novoPonto = null;
-      if (mouse.IsButtonPressed(MouseButton.Left)) {          
-          novoPonto = pontoFormatado();
-          manipulaPoligono(novoPonto);
+      // Questão 9
+      if (teclado.IsKeyPressed(Keys.S)) {
+          pontoMouse = pontoClick();
+          selecionaPoligonoBbox(pontoMouse);
       }
 
-      if (mouse.IsButtonDown(MouseButton.Right) && (poligonoSelecionado != null)) {
-          novoPonto = pontoFormatado();
+      if (teclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
+          objetoSelecionado.MatrizImprimir();
 
-          poligonoSelecionado.PontosAlterar(novoPonto, 0);
-          poligonoSelecionado.ObjetoAtualizar();
-      }
+      // TRANSLAÇÃO
+      
+      if (teclado.IsKeyPressed(Keys.Up))
+          objetoSelecionado.MatrizTranslacaoXYZ(0, 0.1, 0);
+
+      if (teclado.IsKeyPressed(Keys.Left))
+          objetoSelecionado.MatrizTranslacaoXYZ(-0.1, 0, 0);
+
+      if (teclado.IsKeyPressed(Keys.Right))
+          objetoSelecionado.MatrizTranslacaoXYZ(0.1, 0, 0);
+    
+      if (teclado.IsKeyPressed(Keys.Down))
+          objetoSelecionado.MatrizTranslacaoXYZ(0, -0.1, 0);
+
+      // ESCALA
+
+
+      // ROTAÇÃO
+  
       #endregion
     }
 

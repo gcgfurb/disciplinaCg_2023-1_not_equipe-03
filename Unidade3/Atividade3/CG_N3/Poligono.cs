@@ -16,6 +16,10 @@ namespace gcgcg
       Atualizar();
     }
 
+    public int qtdPontos() {
+        return pontosLista.Count;
+    }
+
     private void Atualizar()
     {
 

@@ -137,6 +137,20 @@ namespace gcgcg
       pontosLista[posicao] = pto;
     }
 
+    // Questão 3
+    public void deletaObjeto() {
+        // Reduz o objeto a 1 único ponto.
+        pontosLista.RemoveRange(0, pontosLista.Count-1);
+        ObjetoAtualizar();
+    }
+
+    public void deletaVertice(int id) {
+        if (pontosLista.Count > 1) {
+            pontosLista.RemoveAt(id);
+            ObjetoAtualizar();
+        }
+    }
+
     #endregion
 
     #region Objeto: Grafo de Cena
