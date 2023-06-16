@@ -54,7 +54,7 @@ namespace CG_Biblioteca
     }
 
     public static bool scanLine() {
-        return false;
+        return true;
     }
 
   }

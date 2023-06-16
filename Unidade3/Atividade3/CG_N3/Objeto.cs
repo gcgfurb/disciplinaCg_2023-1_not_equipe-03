@@ -146,6 +146,7 @@ namespace gcgcg
 
     public void deletaVertice(int id) {
         if (pontosLista.Count > 1) {
+            // Remove vértice da lista.
             pontosLista.RemoveAt(id);
             ObjetoAtualizar();
         }

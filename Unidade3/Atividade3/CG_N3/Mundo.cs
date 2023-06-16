@@ -20,9 +20,19 @@ namespace gcgcg
   {
     Objeto mundo;
     private char rotuloAtual = '?';
+    
+    // Manipulação dos objetos na tela
     private Objeto objetoSelecionado = null;
+    private Objeto Bbox = null;
     private List<Objeto> listaPoligonos = new List<Objeto>();
+    
+    // Propriedades Acessórias.
     private Shader corPadrao;
+    private bool criandoObjeto = false;
+
+    // Propriedades p/ manipular grafo de cena.
+    private Objeto objPai = null;
+    private Objeto objFilho = null;
 
     private readonly float[] _sruEixos =
     {
@@ -134,7 +144,7 @@ namespace gcgcg
                 objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
             else {
                 if (listaPoligonos.Contains(objetoSelecionado)) {
-                    objetoSelecionado.shaderCor = _shaderBranca;
+                    // objetoSelecionado.shaderCor = _shaderBranca;
                     objetoSelecionado.ObjetoAtualizar();
 
                     objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>() {novoPonto});
@@ -155,14 +165,15 @@ namespace gcgcg
         }
         
         // Objeto atual volta com a cor branca.    
-        objetoSelecionado.shaderCor = _shaderBranca;
-        objetoSelecionado.ObjetoAtualizar();
+        //objetoSelecionado.shaderCor = _shaderBranca;
+        //objetoSelecionado.ObjetoAtualizar();
 
         int nextPos = 0;
         if (objetoSelecionado != null)
             nextPos = (listaPoligonos.IndexOf(objetoSelecionado) + 1) % listaPoligonos.Count;
 
         objetoSelecionado = listaPoligonos[nextPos];
+
         objetoSelecionado.shaderCor = corPadrao;
         objetoSelecionado.ObjetoAtualizar();
     }
@@ -170,15 +181,18 @@ namespace gcgcg
     // Questão 3
     protected void deletaPoligono() {
         Objeto objAtual = objetoSelecionado;
+        // Remove objeto da lista de polígonos criados.
         proximoPoligono();
-
         listaPoligonos.Remove(objAtual);
-
-        objetoSelecionado.deletaObjeto();
+        // Some com o polígono da tela.
+        objAtual.deletaObjeto();
     }
 
     // Questão 4
     protected int selecionaVerticeProximo(Ponto4D posMouse) {
+        if  (objetoSelecionado == null)
+            return -1;
+
         Poligono poligono = (Poligono) objetoSelecionado;
 
         int qtdPtosPol = poligono.qtdPontos(), ptoSelecionado = -1;
@@ -198,33 +212,71 @@ namespace gcgcg
     protected void deletaVerticePoligono(Ponto4D posMouse) {
         int id = selecionaVerticeProximo(posMouse);
 
-        Poligono p = (Poligono) objetoSelecionado;
-        if (p.qtdPontos() > 1)
-            objetoSelecionado.deletaVertice(id);
-        else
-            deletaPoligono();
+        if  (id > -1) { 
+            Poligono p = (Poligono) objetoSelecionado;
+            if (p.qtdPontos() > 1)
+                objetoSelecionado.deletaVertice(id);
+            else
+                deletaPoligono();
+        }
+    }
+
+    protected double xInt(Ponto4D pt1, Ponto4D pt2, Ponto4D ptoSelecao) {
+        double t = (ptoSelecao.Y - pt1.Y) / (pt2.Y - pt1.Y);
+        double x = pt1.X + (pt2.X - pt1.X) * t;
+
+        return x;
     }
 
     protected bool scanLine(Ponto4D pontoMouse) {
         Poligono P = (Poligono) objetoSelecionado;
+        double ptoxInt = 0;
+
+        int paridade = 0;
         for (int i = 0; i < P.qtdPontos() - 1; i++) {
             if (P.PontosId(i).Y != P.PontosId(i + 1).Y) {
-                return false;
+                ptoxInt = xInt(P.PontosId(i), P.PontosId(i+1), pontoMouse);
+                if  (ptoxInt == pontoMouse.X)
+                    return true;
+                else {
+                    if  ((ptoxInt > pontoMouse.X) && (pontoMouse.Y > Math.Min(P.PontosId(i).Y, P.PontosId(i+1).Y)) && (pontoMouse.Y <= Math.Max(P.PontosId(i).Y, P.PontosId(i+1).Y)))
+                        paridade += 1;
+                }
+            } else {
+                if  ((pontoMouse.Y == P.PontosId(i).Y) && (pontoMouse.X >= Math.Min(P.PontosId(i).X, P.PontosId(i+1).X)) && (pontoMouse.X <= Math.Max(P.PontosId(i).X, P.PontosId(i+1).X)))
+                    return true;
             }
         }
 
-        return false;
+        if  (paridade % 2 == 0)
+            return false;
+        else
+            return true;
     }
 
     protected void selecionaPoligonoBbox(Ponto4D posMouse) {
+        if  (Bbox != null)
+            Bbox.deletaObjeto();
+
         foreach (Objeto poligono in listaPoligonos) {
+            objetoSelecionado = poligono;
             if (Matematica.Dentro(poligono.Bbox(), posMouse)) {
-                if (Matematica.scanLine()) {
+                if (scanLine(posMouse)) {
                     // Desenha BBox
-                } else
+                    Ponto4D ptoInfEsq = new Ponto4D(poligono.Bbox().obterMenorX, poligono.Bbox().obterMenorY);
+                    Ponto4D ptoSupDir = new Ponto4D(poligono.Bbox().obterMaiorX, poligono.Bbox().obterMaiorY);
+
+                    Bbox = new Retangulo(mundo, ref rotuloAtual, ptoInfEsq, ptoSupDir);
+                    Bbox.PrimitivaTipo = PrimitiveType.LineLoop;
+                    Bbox.shaderCor = _shaderAmarela;
+                    Bbox.ObjetoAtualizar();
                     break;
+                }
             }
         }
+
+        if  (Bbox == null)
+            objetoSelecionado = null;
     }
     #endregion
 
@@ -241,30 +293,36 @@ namespace gcgcg
           pontoMouse = pontoClick();      
           // Cria novo ponto para o polígono.
           criaPoligono(pontoMouse);
+          criandoObjeto = true;
       }
       
       // Questão 4
       if (mouse.IsButtonDown(MouseButton.Right) && (objetoSelecionado != null)) {
-          pontoMouse = pontoClick();          
-          // Seleciona qual o vérice mais próximo no polígono atual.
-          int idPontoProximo = selecionaVerticeProximo(pontoMouse);
-          objetoSelecionado.PontosAlterar(pontoMouse, idPontoProximo);
-          objetoSelecionado.ObjetoAtualizar();
+          pontoMouse = pontoClick();
+
+          // Seleciona qual o vértice mais próximo no polígono atual.
+          int id = selecionaVerticeProximo(pontoMouse);
+          if  (id > -1) {
+              objetoSelecionado.PontosAlterar(pontoMouse, id);
+              objetoSelecionado.ObjetoAtualizar();
+          }
       }
       #endregion
 
       #region Teclado
       var teclado = KeyboardState;
       // Questão 2
-      if (teclado.IsKeyPressed(Keys.Enter))
+      if (teclado.IsKeyPressed(Keys.Enter)) {
           // Finaliza criação do polígono.
           criaPoligono(null, true);
+          criandoObjeto = false;
+      }
       
       // Questão 3
       if (teclado.IsKeyPressed(Keys.D))
           deletaPoligono();
 
-      if (teclado.IsKeyPressed(Keys.Space))
+      if (teclado.IsKeyPressed(Keys.Space) && !criandoObjeto)
           proximoPoligono();
 
       // Questão 5
@@ -286,22 +344,28 @@ namespace gcgcg
       // Questão 8
       if (teclado.IsKeyPressed(Keys.R)) {
           corPadrao = _shaderVermelha;
-          objetoSelecionado.shaderCor = corPadrao;
-          objetoSelecionado.ObjetoAtualizar();
+          if  (objetoSelecionado != null) {
+              objetoSelecionado.shaderCor = corPadrao;
+              objetoSelecionado.ObjetoAtualizar();
+          }
       }
 
       // Questão 8
       if (teclado.IsKeyPressed(Keys.G)) {
           corPadrao = _shaderVerde;
-          objetoSelecionado.shaderCor = corPadrao;
-          objetoSelecionado.ObjetoAtualizar();
+          if  (objetoSelecionado != null) {
+              objetoSelecionado.shaderCor = corPadrao;
+              objetoSelecionado.ObjetoAtualizar();
+          }
       }
 
       // Questão 8
       if (teclado.IsKeyPressed(Keys.B)) {
           corPadrao = _shaderAzul;
-          objetoSelecionado.shaderCor = corPadrao;
-          objetoSelecionado.ObjetoAtualizar();
+          if  (objetoSelecionado != null) {
+              objetoSelecionado.shaderCor = corPadrao;
+              objetoSelecionado.ObjetoAtualizar();
+          }
       }
 
       // Questão 9
@@ -313,24 +377,53 @@ namespace gcgcg
       if (teclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
           objetoSelecionado.MatrizImprimir();
 
-      // TRANSLAÇÃO
+      // Questão 10 - TRANSLAÇÃO
       
       if (teclado.IsKeyPressed(Keys.Up))
-          objetoSelecionado.MatrizTranslacaoXYZ(0, 0.1, 0);
+          objetoSelecionado.MatrizTranslacaoXYZ(0.0, 0.1, 0.1);
 
       if (teclado.IsKeyPressed(Keys.Left))
-          objetoSelecionado.MatrizTranslacaoXYZ(-0.1, 0, 0);
+          objetoSelecionado.MatrizTranslacaoXYZ(-0.1, 0, -0.1);
 
       if (teclado.IsKeyPressed(Keys.Right))
-          objetoSelecionado.MatrizTranslacaoXYZ(0.1, 0, 0);
+          objetoSelecionado.MatrizTranslacaoXYZ(0.1, 0, 0.1);
     
       if (teclado.IsKeyPressed(Keys.Down))
-          objetoSelecionado.MatrizTranslacaoXYZ(0, -0.1, 0);
+          objetoSelecionado.MatrizTranslacaoXYZ(0, -0.1, -0.1);
 
-      // ESCALA
+      // Questão 11 - ESCALA
+      
+      if (teclado.IsKeyPressed(Keys.Home))
+          objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
 
+      if (teclado.IsKeyPressed(Keys.End))
+          objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
 
-      // ROTAÇÃO
+      // Questão 12 - ROTAÇÃO
+
+      if (teclado.IsKeyPressed(Keys.KeyPad3))
+          objetoSelecionado.MatrizRotacaoZBBox(5);
+
+      if (teclado.IsKeyPressed(Keys.KeyPad4))
+          objetoSelecionado.MatrizRotacaoZBBox(-5);
+
+      // Questão 13
+      if  (teclado.IsKeyPressed(Keys.F)) {
+           // Primeira vez: Seleciona objeto pai.
+           if  (objPai == null)
+               objPai = objetoSelecionado;
+           else {
+               if  (objetoSelecionado == objPai)
+                   // Objeto selecionado é o mesmo de antes, desfaz tudo.
+                   objPai = null;
+               else {
+                   objPai.FilhoAdicionar(objetoSelecionado);
+               }
+           }
+      }
+
+      if  (teclado.IsKeyPressed(Keys.C))
+          objetoSelecionado.GrafocenaImprimir("Poligono");
   
       #endregion
     }
