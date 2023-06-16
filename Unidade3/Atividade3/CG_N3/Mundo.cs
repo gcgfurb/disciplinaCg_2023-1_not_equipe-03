@@ -221,6 +221,7 @@ namespace gcgcg
         }
     }
 
+    // Questão 9
     protected double xInt(Ponto4D pt1, Ponto4D pt2, Ponto4D ptoSelecao) {
         double t = (ptoSelecao.Y - pt1.Y) / (pt2.Y - pt1.Y);
         double x = pt1.X + (pt2.X - pt1.X) * t;
@@ -228,6 +229,7 @@ namespace gcgcg
         return x;
     }
 
+    // Questão 9
     protected bool scanLine(Ponto4D pontoMouse) {
         Poligono P = (Poligono) objetoSelecionado;
         double ptoxInt = 0;
@@ -254,6 +256,7 @@ namespace gcgcg
             return true;
     }
 
+    // Questão 9
     protected void selecionaPoligonoBbox(Ponto4D posMouse) {
         if  (Bbox != null)
             Bbox.deletaObjeto();
@@ -285,6 +288,11 @@ namespace gcgcg
       base.OnUpdateFrame(e);
       // Pega localização do click na tela.
       Ponto4D pontoMouse = null;
+
+      // TODO: Questão 14.
+      // TODO: Ajuste movimentação vértice quando tem transformação.
+      // TODO: Criar método p/ saber qual polígono está selecionado.
+      // TODO: Polir código se possível.
 
       #region Mouse
       var mouse = MouseState;
