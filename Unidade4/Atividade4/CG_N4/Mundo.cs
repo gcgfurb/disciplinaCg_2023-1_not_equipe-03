@@ -41,6 +41,7 @@ namespace gcgcg
     private Shader _shaderAmarela;
 
     private Camera _camera;
+    private Vector2 lastPos;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -104,7 +105,8 @@ namespace gcgcg
       GL.EnableVertexAttribArray(0);
       #endregion
 
-      #region Objeto: polígono qualquer  
+      #region Objeto: polígono qualquer
+      /*
       List<Ponto4D> pontosPoligonoBandeira = new List<Ponto4D>();
       pontosPoligonoBandeira.Add(new Ponto4D(0.25, 0.25));
       pontosPoligonoBandeira.Add(new Ponto4D(0.75, 0.25));
@@ -112,17 +114,21 @@ namespace gcgcg
       pontosPoligonoBandeira.Add(new Ponto4D(0.50, 0.50));
       pontosPoligonoBandeira.Add(new Ponto4D(0.25, 0.75));
       objetoSelecionado = new Poligono(mundo, ref rotuloNovo, pontosPoligonoBandeira);
+      */
       #endregion
       #region declara um objeto filho ao polígono qualquer
+      /*
       List<Ponto4D> pontosPoligonoTriangulo = new List<Ponto4D>();
       pontosPoligonoTriangulo.Add(new Ponto4D(0.50, 0.50));
       pontosPoligonoTriangulo.Add(new Ponto4D(0.75, 0.75));
       pontosPoligonoTriangulo.Add(new Ponto4D(0.25, 0.75));
       objetoSelecionado = new Poligono(objetoSelecionado, ref rotuloNovo, pontosPoligonoTriangulo);
       objetoSelecionado.PrimitivaTipo = PrimitiveType.Triangles;
+      */
       #endregion
 
-      #region Objeto: polígono quadrado
+      #region Objeto: polígono 
+      /*
       List<Ponto4D> pontosPoligonoQuadrado = new List<Ponto4D>();
       pontosPoligonoQuadrado.Add(new Ponto4D(-0.25, 0.25, 0.1));
       pontosPoligonoQuadrado.Add(new Ponto4D(-0.75, 0.25, 0.1));
@@ -130,15 +136,22 @@ namespace gcgcg
       pontosPoligonoQuadrado.Add(new Ponto4D(-0.25, 0.75, 0.1));
       objetoSelecionado = new Poligono(mundo, ref rotuloNovo, pontosPoligonoQuadrado);
       objetoSelecionado.PrimitivaTipo = PrimitiveType.TriangleFan;
+      */
       #endregion
 
       #region Objeto: Cubo
+      
       objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
       objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
+      
       #endregion
 
       _camera = new Camera(Vector3.UnitZ, Size.X / (float)Size.Y);
 
+      // Cursor do mouse não é mais visível.
+      CursorVisible = false;
+      // Cursor não deixará a tela.
+      CursorGrabbed = true;
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -155,6 +168,13 @@ namespace gcgcg
       SwapBuffers();
     }
 
+    protected override void OnMouseMove(MouseMoveEventArgs e) {
+      base.OnMouseMove(e);
+
+      if (IsFocused)
+        // SetPosition(e.X + Size.X/2f, e.Y + Size.Y/2f);      
+    }
+
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
       base.OnUpdateFrame(e);
@@ -162,6 +182,7 @@ namespace gcgcg
       // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc   TODO: forma otimizada para teclado.
       #region Teclado
       var input = KeyboardState;
+      /*
       if (input.IsKeyDown(Keys.Escape))
         Close();
       if (input.IsKeyPressed(Keys.Space))
@@ -224,11 +245,28 @@ namespace gcgcg
         _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
       if (input.IsKeyDown(Keys.LeftShift))
         _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
-
+      */
       #endregion
 
       #region  Mouse
+      float deltaX = MousePosition.X - lastPos.X;
+      float deltaY = MousePosition.Y - lastPos.Y;
+      lastPos = new Vector2(MousePosition.X, MousePosition.Y);
 
+      _camera.Pitch += deltaY * 0.25f;
+      _camera.Yaw -= deltaX * 0.25f;
+
+      if (_camera.Pitch > 89.0f) {
+        _camera.Pitch = 89.0f;
+      }
+      else if(_camera.Pitch < -89.0f) {
+        _camera.Pitch = -89.0f;
+      }
+      else {
+        _camera.Pitch -= deltaX * 0.25f;
+      }
+
+      /*
       if (MouseState.IsButtonPressed(MouseButton.Left))
       {
         System.Console.WriteLine("MouseState.IsButtonPressed(MouseButton.Left)");
@@ -251,7 +289,7 @@ namespace gcgcg
       {
         System.Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
       }
-
+      */
       #endregion
 
     }
