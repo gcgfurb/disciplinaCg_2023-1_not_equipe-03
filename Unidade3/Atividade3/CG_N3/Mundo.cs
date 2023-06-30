@@ -289,11 +289,6 @@ namespace gcgcg
       // Pega localização do click na tela.
       Ponto4D pontoMouse = null;
 
-      // TODO: Questão 14.
-      // TODO: Ajuste movimentação vértice quando tem transformação.
-      // TODO: Criar método p/ saber qual polígono está selecionado.
-      // TODO: Polir código se possível.
-
       #region Mouse
       var mouse = MouseState;
       // Questão 2

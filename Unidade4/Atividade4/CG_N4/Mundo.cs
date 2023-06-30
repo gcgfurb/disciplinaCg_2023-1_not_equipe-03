@@ -40,6 +40,9 @@ namespace gcgcg
     private Shader _shaderMagenta;
     private Shader _shaderAmarela;
 
+    private Shader _lampShader;
+    private Shader _lightingShader;
+
     private Camera _camera;
     private Vector2 lastPos;
 
@@ -105,53 +108,14 @@ namespace gcgcg
       GL.EnableVertexAttribArray(0);
       #endregion
 
-      #region Objeto: polígono qualquer
-      /*
-      List<Ponto4D> pontosPoligonoBandeira = new List<Ponto4D>();
-      pontosPoligonoBandeira.Add(new Ponto4D(0.25, 0.25));
-      pontosPoligonoBandeira.Add(new Ponto4D(0.75, 0.25));
-      pontosPoligonoBandeira.Add(new Ponto4D(0.75, 0.75));
-      pontosPoligonoBandeira.Add(new Ponto4D(0.50, 0.50));
-      pontosPoligonoBandeira.Add(new Ponto4D(0.25, 0.75));
-      objetoSelecionado = new Poligono(mundo, ref rotuloNovo, pontosPoligonoBandeira);
-      */
-      #endregion
-      #region declara um objeto filho ao polígono qualquer
-      /*
-      List<Ponto4D> pontosPoligonoTriangulo = new List<Ponto4D>();
-      pontosPoligonoTriangulo.Add(new Ponto4D(0.50, 0.50));
-      pontosPoligonoTriangulo.Add(new Ponto4D(0.75, 0.75));
-      pontosPoligonoTriangulo.Add(new Ponto4D(0.25, 0.75));
-      objetoSelecionado = new Poligono(objetoSelecionado, ref rotuloNovo, pontosPoligonoTriangulo);
-      objetoSelecionado.PrimitivaTipo = PrimitiveType.Triangles;
-      */
-      #endregion
-
-      #region Objeto: polígono 
-      /*
-      List<Ponto4D> pontosPoligonoQuadrado = new List<Ponto4D>();
-      pontosPoligonoQuadrado.Add(new Ponto4D(-0.25, 0.25, 0.1));
-      pontosPoligonoQuadrado.Add(new Ponto4D(-0.75, 0.25, 0.1));
-      pontosPoligonoQuadrado.Add(new Ponto4D(-0.75, 0.75, 0.1));
-      pontosPoligonoQuadrado.Add(new Ponto4D(-0.25, 0.75, 0.1));
-      objetoSelecionado = new Poligono(mundo, ref rotuloNovo, pontosPoligonoQuadrado);
-      objetoSelecionado.PrimitivaTipo = PrimitiveType.TriangleFan;
-      */
-      #endregion
-
       #region Objeto: Cubo
-      
-      objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
-      objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
-      
+      objetoSelecionado = new Cubo(mundo, ref rotuloNovo, _shaderVermelha);
       #endregion
+
+      CursorState = CursorState.Grabbed;
 
       _camera = new Camera(Vector3.UnitZ, Size.X / (float)Size.Y);
 
-      // Cursor do mouse não é mais visível.
-      CursorVisible = false;
-      // Cursor não deixará a tela.
-      CursorGrabbed = true;
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -168,11 +132,32 @@ namespace gcgcg
       SwapBuffers();
     }
 
-    protected override void OnMouseMove(MouseMoveEventArgs e) {
-      base.OnMouseMove(e);
+    protected void basicLightning() {
+      //
+    }
 
-      if (IsFocused)
-        // SetPosition(e.X + Size.X/2f, e.Y + Size.Y/2f);      
+    protected void lightingMaps() {
+      //
+    }
+
+    protected void lightCasters_DirectionalLights() {
+      //
+    }
+
+    protected void lightCasters_PointLights() {
+      //
+    }
+
+    protected void lightCasters_Spotlight() {
+      //
+    }
+
+    protected void multipleLights() {
+      //
+    }
+
+    protected void sem_iluminacao() {
+      //
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -182,70 +167,53 @@ namespace gcgcg
       // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc   TODO: forma otimizada para teclado.
       #region Teclado
       var input = KeyboardState;
-      /*
-      if (input.IsKeyDown(Keys.Escape))
-        Close();
-      if (input.IsKeyPressed(Keys.Space))
-      {
-        if (objetoSelecionado == null)
-          objetoSelecionado = mundo;
-        objetoSelecionado.shaderCor = _shaderBranca;
-        objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
-        objetoSelecionado.shaderCor = _shaderAmarela;
-      }
-      if (input.IsKeyPressed(Keys.G))
-        mundo.GrafocenaImprimir("");
-      if (input.IsKeyPressed(Keys.P) && objetoSelecionado != null)
-        System.Console.WriteLine(objetoSelecionado.ToString());
-      if (input.IsKeyPressed(Keys.M) && objetoSelecionado != null)
-        objetoSelecionado.MatrizImprimir();
-      if (input.IsKeyPressed(Keys.I) && objetoSelecionado != null)
-        objetoSelecionado.MatrizAtribuirIdentidade();
-      if (input.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(-0.05, 0, 0);
-      if (input.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(0.05, 0, 0);
-      if (input.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(0, 0.05, 0);
-      if (input.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(0, -0.05, 0);
-      if (input.IsKeyPressed(Keys.O) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.05);
-      if (input.IsKeyPressed(Keys.L) && objetoSelecionado != null)
-        objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.05);
-      if (input.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
-        objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
-      if (input.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
-        objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
-      if (input.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
-        objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
-      if (input.IsKeyPressed(Keys.End) && objetoSelecionado != null)
-        objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
-      if (input.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
-        objetoSelecionado.MatrizRotacao(10);
-      if (input.IsKeyPressed(Keys.D2) && objetoSelecionado != null)
-        objetoSelecionado.MatrizRotacao(-10);
-      if (input.IsKeyPressed(Keys.D3) && objetoSelecionado != null)
-        objetoSelecionado.MatrizRotacaoZBBox(10);
-      if (input.IsKeyPressed(Keys.D4) && objetoSelecionado != null)
-        objetoSelecionado.MatrizRotacaoZBBox(-10);
+      if  (input.IsKeyDown(Keys.Escape))
+          Close();
 
+      // Informações
+      if  (input.IsKeyPressed(Keys.G))
+          mundo.GrafocenaImprimir("");
+
+      if  (input.IsKeyPressed(Keys.P) && objetoSelecionado != null)
+          System.Console.WriteLine(objetoSelecionado.ToString());
+
+      if  (input.IsKeyPressed(Keys.M) && objetoSelecionado != null)
+          objetoSelecionado.MatrizImprimir();
+
+      // Movimentação da Câmera
       const float cameraSpeed = 1.5f;
-      if (input.IsKeyDown(Keys.Z))
-        _camera.Position = Vector3.UnitZ;
-      if (input.IsKeyDown(Keys.W))
-        _camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward
-      if (input.IsKeyDown(Keys.S))
-        _camera.Position -= _camera.Front * cameraSpeed * (float)e.Time; // Backwards
-      if (input.IsKeyDown(Keys.A))
-        _camera.Position -= _camera.Right * cameraSpeed * (float)e.Time; // Left
-      if (input.IsKeyDown(Keys.D))
-        _camera.Position += _camera.Right * cameraSpeed * (float)e.Time; // Right
-      if (input.IsKeyDown(Keys.RightShift))
-        _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
-      if (input.IsKeyDown(Keys.LeftShift))
-        _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
-      */
+      if  (input.IsKeyDown(Keys.W))
+          _camera.Position += _camera.Front * cameraSpeed * (float)e.Time;
+
+      if  (input.IsKeyDown(Keys.S))
+          _camera.Position -= _camera.Front * cameraSpeed * (float)e.Time;
+          
+      if  (input.IsKeyDown(Keys.A))
+          _camera.Position -= _camera.Right * cameraSpeed * (float)e.Time;
+
+      if  (input.IsKeyDown(Keys.D))
+          _camera.Position += _camera.Right * cameraSpeed * (float)e.Time;
+
+      if  (input.IsKeyDown(Keys.KeyPad1))
+          basicLightning();
+
+      if  (input.IsKeyDown(Keys.KeyPad2))
+          lightingMaps();
+
+      if  (input.IsKeyDown(Keys.KeyPad3))
+          lightCasters_DirectionalLights();
+
+      if  (input.IsKeyDown(Keys.KeyPad4))
+          lightCasters_PointLights();
+
+      if  (input.IsKeyDown(Keys.KeyPad5))
+          lightCasters_Spotlight();
+
+      if  (input.IsKeyDown(Keys.KeyPad6))
+          multipleLights();
+
+      if  (input.IsKeyDown(Keys.KeyPad0))
+          sem_iluminacao();
       #endregion
 
       #region  Mouse
@@ -253,45 +221,19 @@ namespace gcgcg
       float deltaY = MousePosition.Y - lastPos.Y;
       lastPos = new Vector2(MousePosition.X, MousePosition.Y);
 
-      _camera.Pitch += deltaY * 0.25f;
-      _camera.Yaw -= deltaX * 0.25f;
+      _camera.Yaw += deltaX;
+      _camera.Pitch -= deltaY;
 
-      if (_camera.Pitch > 89.0f) {
-        _camera.Pitch = 89.0f;
+      if  (_camera.Pitch > 89.0f) {
+          _camera.Pitch = 89.0f;
       }
-      else if(_camera.Pitch < -89.0f) {
-        _camera.Pitch = -89.0f;
+      else if (_camera.Pitch < -89.0f) {
+          _camera.Pitch = -89.0f;
       }
       else {
-        _camera.Pitch -= deltaX * 0.25f;
+          _camera.Pitch -= deltaX * 0.25f;
       }
-
-      /*
-      if (MouseState.IsButtonPressed(MouseButton.Left))
-      {
-        System.Console.WriteLine("MouseState.IsButtonPressed(MouseButton.Left)");
-        System.Console.WriteLine("__ Valores do Espaço de Tela");
-        System.Console.WriteLine("Vector2 mousePosition: " + MousePosition);
-        System.Console.WriteLine("Vector2i windowSize: " + Size);
-      }
-      if (MouseState.IsButtonDown(MouseButton.Right) && objetoSelecionado != null)
-      {
-        System.Console.WriteLine("MouseState.IsButtonDown(MouseButton.Right)");
-
-        int janelaLargura = Size.X;
-        int janelaAltura = Size.Y;
-        Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
-        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
-
-        objetoSelecionado.PontosAlterar(sruPonto, 0);
-      }
-      if (MouseState.IsButtonReleased(MouseButton.Right))
-      {
-        System.Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
-      }
-      */
       #endregion
-
     }
 
     protected override void OnResize(ResizeEventArgs e)
