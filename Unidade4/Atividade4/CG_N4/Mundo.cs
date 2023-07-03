@@ -44,7 +44,8 @@ namespace gcgcg
     private Shader _lightingShader;
 
     private Camera _camera;
-    private Vector2 lastPos;
+    private float anguloX;
+    private float anguloY;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -84,7 +85,7 @@ namespace gcgcg
       GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
       GL.Enable(EnableCap.DepthTest);       // Ativar teste de profundidade
-      // GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
+      GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
       // GL.FrontFace(FrontFaceDirection.Cw);
       // GL.CullFace(CullFaceMode.FrontAndBack);
 
@@ -99,23 +100,27 @@ namespace gcgcg
       #endregion
 
       #region Eixos: SRU  
-      _vertexBufferObject_sruEixos = GL.GenBuffer();
-      GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject_sruEixos);
-      GL.BufferData(BufferTarget.ArrayBuffer, _sruEixos.Length * sizeof(float), _sruEixos, BufferUsageHint.StaticDraw);
-      _vertexArrayObject_sruEixos = GL.GenVertexArray();
-      GL.BindVertexArray(_vertexArrayObject_sruEixos);
-      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-      GL.EnableVertexAttribArray(0);
+      // _vertexBufferObject_sruEixos = GL.GenBuffer();
+      // GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject_sruEixos);
+      // GL.BufferData(BufferTarget.ArrayBuffer, _sruEixos.Length * sizeof(float), _sruEixos, BufferUsageHint.StaticDraw);
+      // _vertexArrayObject_sruEixos = GL.GenVertexArray();
+      // GL.BindVertexArray(_vertexArrayObject_sruEixos);
+      // GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+      // GL.EnableVertexAttribArray(0);
       #endregion
 
       #region Objeto: Cubo
       objetoSelecionado = new Cubo(mundo, ref rotuloNovo, _shaderVermelha);
+      // CuboTeste cubo = new CuboTeste(mundo, ref rotuloNovo);
+      // cubo.desenhaCubo();
       #endregion
 
       CursorState = CursorState.Grabbed;
 
-      _camera = new Camera(Vector3.UnitZ, Size.X / (float)Size.Y);
+      anguloX = 0;
+      anguloY = 0;
 
+      _camera = new Camera(new Vector3(0.0f, 0.0f, 2.0f), Size.X / (float)Size.Y);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -130,6 +135,25 @@ namespace gcgcg
       Gizmo_Sru3D();
 #endif
       SwapBuffers();
+    }
+
+    protected override void OnMouseWheel(MouseWheelEventArgs e) {
+      base.OnMouseWheel(e);
+      
+      // Zoom da câmera
+      _camera.Fov -= e.OffsetY;
+    }
+
+    protected override void OnMouseMove(MouseMoveEventArgs e) {
+      base.OnMouseMove(e);
+
+      anguloX += e.DeltaX;
+      anguloY += e.DeltaY;
+
+      Ponto4D posXZ = Matematica.GerarPtosCirculo(anguloX, 2.0f);
+      Ponto4D posY = Matematica.GerarPtosCirculo(anguloY, 2.0f);
+      
+      _camera.Position = new Vector3((float) posXZ.X, (float) posY.Y, (float) posXZ.Y);
     }
 
     protected void basicLightning() {
@@ -181,6 +205,7 @@ namespace gcgcg
           objetoSelecionado.MatrizImprimir();
 
       // Movimentação da Câmera
+      /*
       const float cameraSpeed = 1.5f;
       if  (input.IsKeyDown(Keys.W))
           _camera.Position += _camera.Front * cameraSpeed * (float)e.Time;
@@ -193,6 +218,7 @@ namespace gcgcg
 
       if  (input.IsKeyDown(Keys.D))
           _camera.Position += _camera.Right * cameraSpeed * (float)e.Time;
+      */
 
       if  (input.IsKeyDown(Keys.KeyPad1))
           basicLightning();
@@ -215,11 +241,12 @@ namespace gcgcg
       if  (input.IsKeyDown(Keys.KeyPad0))
           sem_iluminacao();
       #endregion
-
+      
+      /*
       #region  Mouse
-      float deltaX = MousePosition.X - lastPos.X;
-      float deltaY = MousePosition.Y - lastPos.Y;
-      lastPos = new Vector2(MousePosition.X, MousePosition.Y);
+      float deltaX = MousePosition.X - _lastPos.X;
+      float deltaY = MousePosition.Y - _lastPos.Y;
+      _lastPos = new Vector2(MousePosition.X, MousePosition.Y);
 
       _camera.Yaw += deltaX;
       _camera.Pitch -= deltaY;
@@ -234,6 +261,7 @@ namespace gcgcg
           _camera.Pitch -= deltaX * 0.25f;
       }
       #endregion
+      */
     }
 
     protected override void OnResize(ResizeEventArgs e)
