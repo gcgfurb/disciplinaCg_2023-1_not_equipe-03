@@ -22,15 +22,81 @@ namespace gcgcg
     private char rotuloNovo = '?';
     private Objeto objetoSelecionado = null;
 
-    private readonly float[] _sruEixos =
-    {
-      -0.5f,  0.0f,  0.0f, /* X- */      0.5f,  0.0f,  0.0f, /* X+ */
-       0.0f, -0.5f,  0.0f, /* Y- */      0.0f,  0.5f,  0.0f, /* Y+ */
-       0.0f,  0.0f, -0.5f, /* Z- */      0.0f,  0.0f,  0.5f  /* Z+ */
+    // private readonly float[] _sruEixos =
+    // {
+      // -0.5f,  0.0f,  0.0f, /* X- */      0.5f,  0.0f,  0.0f, /* X+ */
+      //  0.0f, -0.5f,  0.0f, /* Y- */      0.0f,  0.5f,  0.0f, /* Y+ */
+      //  0.0f,  0.0f, -0.5f, /* Z- */      0.0f,  0.0f,  0.5f  /* Z+ */
+    // };
+
+    // private int _vertexBufferObject_sruEixos;
+    // private int _vertexArrayObject_sruEixos;
+
+    private readonly float[] verticesText = {
+      //Pontos                 //Normals            //Cood textura
+      -1.05f, -1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/0.0f,  0.0f,
+       1.05f, -1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/1.0f,  0.0f,
+       1.05f,  1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/1.0f,  1.0f,
+       1.05f,  1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/1.0f,  1.0f,
+      -1.05f,  1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/0.0f,  1.0f,
+      -1.05f, -1.05f, -1.05f,/*0.0f,  0.0f, -1.0f,*/0.0f,  0.0f,
+
+      -1.05f, -1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/0.0f,  0.0f,
+       1.05f, -1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/1.0f,  0.0f,
+       1.05f,  1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/1.0f,  1.0f,
+       1.05f,  1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/1.0f,  1.0f,
+      -1.05f,  1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/0.0f,  1.0f,
+      -1.05f, -1.05f,  1.05f,/*0.0f,  0.0f,  1.0f,*/0.0f,  0.0f,
+
+      -1.05f,  1.05f,  1.05f,/*-1.0f,  0.0f,  0.0f,*/1.0f,  0.0f,
+      -1.05f,  1.05f, -1.05f,/*-1.0f,  0.0f,  0.0f,*/1.0f,  1.0f,
+      -1.05f, -1.05f, -1.05f,/*-1.0f,  0.0f,  0.0f,*/0.0f,  1.0f,
+      -1.05f, -1.05f, -1.05f,/*-1.0f,  0.0f,  0.0f,*/0.0f,  1.0f,
+      -1.05f, -1.05f,  1.05f,/*-1.0f,  0.0f,  0.0f,*/0.0f,  0.0f,
+      -1.05f,  1.05f,  1.05f,/*-1.0f,  0.0f,  0.0f,*/1.0f,  0.0f,
+
+       1.05f,  1.05f,  1.05f,/*1.0f,  0.0f,  0.0f,*/1.0f,  0.0f,
+       1.05f,  1.05f, -1.05f,/*1.0f,  0.0f,  0.0f,*/1.0f,  1.0f,
+       1.05f, -1.05f, -1.05f,/*1.0f,  0.0f,  0.0f,*/0.0f,  1.0f,
+       1.05f, -1.05f, -1.05f,/*1.0f,  0.0f,  0.0f,*/0.0f,  1.0f,
+       1.05f, -1.05f,  1.05f,/*1.0f,  0.0f,  0.0f,*/0.0f,  0.0f,
+       1.05f,  1.05f,  1.05f,/*1.0f,  0.0f,  0.0f,*/1.0f,  0.0f,
+
+      -1.05f, -1.05f, -1.05f,/*0.0f, -1.0f,  0.0f,*/0.0f,  1.0f,
+       1.05f, -1.05f, -1.05f,/*0.0f, -1.0f,  0.0f,*/1.0f,  1.0f,
+       1.05f, -1.05f,  1.05f,/*0.0f, -1.0f,  0.0f,*/1.0f,  0.0f,
+       1.05f, -1.05f,  1.05f,/*0.0f, -1.0f,  0.0f,*/1.0f,  0.0f,
+      -1.05f, -1.05f,  1.05f,/*0.0f, -1.0f,  0.0f,*/0.0f,  0.0f,
+      -1.05f, -1.05f, -1.05f,/*0.0f, -1.0f,  0.0f,*/0.0f,  1.0f,
+
+      -1.05f,  1.05f, -1.05f,/*0.0f,  1.0f,  0.0f,*/0.0f,  1.0f,
+       1.05f,  1.05f, -1.05f,/*0.0f,  1.0f,  0.0f,*/1.0f,  1.0f,
+       1.05f,  1.05f,  1.05f,/*0.0f,  1.0f,  0.0f,*/1.0f,  0.0f,
+       1.05f,  1.05f,  1.05f,/*0.0f,  1.0f,  0.0f,*/1.0f,  0.0f,
+      -1.05f,  1.05f,  1.05f,/*0.0f,  1.0f,  0.0f,*/0.0f,  0.0f,
+      -1.05f,  1.05f, -1.05f,/*0.0f,  1.0f,  0.0f,*/0.0f,  1.0f
     };
 
-    private int _vertexBufferObject_sruEixos;
-    private int _vertexArrayObject_sruEixos;
+    private readonly uint[] indicesText =
+    {
+        0, 1, 2, 2, 3, 0, // front face
+        3, 2, 6, 6, 7, 3, // top face
+        7, 6, 5, 5, 4, 7, // back face
+        4, 0, 3, 3, 7, 4, // left face
+        0, 1, 5, 5, 4, 0, // bottom face  
+        1, 5, 6, 6, 2, 1,
+    };
+
+    // private int _vertexBufferObject_sruEixos;
+    // private int _vertexArrayObject_sruEixos;
+
+    private int _vertexBufferObject;
+    private int _vertexArrayObject;
+
+    private Shader _shader;
+    private Texture _texture;
+
+    private int _elementBufferObject;
 
     private Shader _shaderBranca;
     private Shader _shaderVermelha;
@@ -40,8 +106,10 @@ namespace gcgcg
     private Shader _shaderMagenta;
     private Shader _shaderAmarela;
 
+    private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
     private Shader _lampShader;
     private Shader _lightingShader;
+    private int _vaoLamp;
 
     private Camera _camera;
     private float anguloX;
@@ -85,7 +153,7 @@ namespace gcgcg
       GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
       GL.Enable(EnableCap.DepthTest);       // Ativar teste de profundidade
-      GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
+      //GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
       // GL.FrontFace(FrontFaceDirection.Cw);
       // GL.CullFace(CullFaceMode.FrontAndBack);
 
@@ -109,10 +177,43 @@ namespace gcgcg
       // GL.EnableVertexAttribArray(0);
       #endregion
 
+      #region Textura
+      GL.Enable(EnableCap.Texture2D);
+
+      _vertexArrayObject = GL.GenVertexArray();
+      GL.BindVertexArray(_vertexArrayObject);
+
+      _vertexBufferObject = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+      GL.BufferData(BufferTarget.ArrayBuffer, verticesText.Length * sizeof(float), verticesText, BufferUsageHint.StaticDraw);
+
+      _elementBufferObject = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+      GL.BufferData(BufferTarget.ElementArrayBuffer, indicesText.Length * sizeof(uint), indicesText, BufferUsageHint.StaticDraw);
+
+      _shader = new Shader("Shaders/shaderText.vert", "Shaders/shaderText.frag");
+      _shader.Use();
+
+      int vertexLocation = _shader.GetAttribLocation("aPosition");
+      GL.EnableVertexAttribArray(vertexLocation);
+      GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+
+      int texCoordLocation = _shader.GetAttribLocation("aTexCoord");
+      GL.EnableVertexAttribArray(texCoordLocation);
+      GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+
+      _texture = Texture.LoadFromFile("Texture/grupo.png");
+      _texture.Use(TextureUnit.Texture0);
+      #endregion
+
+      #region Teste Iluminação Basic Lightning
+      _lightingShader = new Shader("Shaders/shader.vert", "Shaders/lighting.frag");
+      _lampShader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+      #endregion
+
       #region Objeto: Cubo
-      objetoSelecionado = new Cubo(mundo, ref rotuloNovo, _shaderVermelha);
-      // CuboTeste cubo = new CuboTeste(mundo, ref rotuloNovo);
-      // cubo.desenhaCubo();
+      objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
+      objetoSelecionado.shaderCor = _shader;
       #endregion
 
       CursorState = CursorState.Grabbed;
@@ -120,7 +221,7 @@ namespace gcgcg
       anguloX = 0;
       anguloY = 0;
 
-      _camera = new Camera(new Vector3(0.0f, 0.0f, 2.0f), Size.X / (float)Size.Y);
+      _camera = new Camera(new Vector3(0.0f, 0.0f, 5.0f), Size.X / (float)Size.Y);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -130,6 +231,37 @@ namespace gcgcg
       GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
       mundo.Desenhar(new Transformacao4D(), _camera);
+
+      GL.BindVertexArray(_vertexArrayObject);
+
+      _lightingShader.Use();
+
+      _lightingShader.SetMatrix4("model", Matrix4.Identity);
+      _lightingShader.SetMatrix4("view", _camera.GetViewMatrix());
+      _lightingShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+
+      _lightingShader.SetVector3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
+      _lightingShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
+      _lightingShader.SetVector3("lightPos", _lightPos);
+      _lightingShader.SetVector3("viewPos", _camera.Position);
+
+      _texture.Use(TextureUnit.Texture0);
+      _shader.Use();
+
+      GL.DrawElements(PrimitiveType.Triangles, indicesText.Length, DrawElementsType.UnsignedInt, 0);
+
+      GL.BindVertexArray(_vaoLamp);
+
+      _lampShader.Use();
+
+      Matrix4 lampMatrix = Matrix4.CreateScale(0.2f);
+      lampMatrix = lampMatrix * Matrix4.CreateTranslation(_lightPos);
+
+      _lampShader.SetMatrix4("model", lampMatrix);
+      _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
+      _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+
+      GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
 #if CG_Gizmo      
       Gizmo_Sru3D();
@@ -150,8 +282,13 @@ namespace gcgcg
       anguloX += e.DeltaX;
       anguloY += e.DeltaY;
 
-      Ponto4D posXZ = Matematica.GerarPtosCirculo(anguloX, 2.0f);
-      Ponto4D posY = Matematica.GerarPtosCirculo(anguloY, 2.0f);
+      if  (anguloY > 100)
+          anguloY = 100;
+      else if (anguloY < -100)
+          anguloY = -100;
+
+      Ponto4D posXZ = Matematica.GerarPtosCirculo(anguloX, 5.0f);
+      Ponto4D posY = Matematica.GerarPtosCirculo(anguloY, 5.0f);
       
       _camera.Position = new Vector3((float) posXZ.X, (float) posY.Y, (float) posXZ.Y);
     }
@@ -279,8 +416,8 @@ namespace gcgcg
       GL.BindVertexArray(0);
       GL.UseProgram(0);
 
-      GL.DeleteBuffer(_vertexBufferObject_sruEixos);
-      GL.DeleteVertexArray(_vertexArrayObject_sruEixos);
+      // GL.DeleteBuffer(_vertexBufferObject_sruEixos);
+      // GL.DeleteVertexArray(_vertexArrayObject_sruEixos);
 
       GL.DeleteProgram(_shaderBranca.Handle);
       GL.DeleteProgram(_shaderVermelha.Handle);
@@ -298,25 +435,25 @@ namespace gcgcg
     {
 #if CG_OpenGL && !CG_DirectX
       var model = Matrix4.Identity;
-      GL.BindVertexArray(_vertexArrayObject_sruEixos);
+      // GL.BindVertexArray(_vertexArrayObject_sruEixos);
       // EixoX
-      _shaderVermelha.SetMatrix4("model", model);
-      _shaderVermelha.SetMatrix4("view", _camera.GetViewMatrix());
-      _shaderVermelha.SetMatrix4("projection", _camera.GetProjectionMatrix());
-      _shaderVermelha.Use();
-      GL.DrawArrays(PrimitiveType.Lines, 0, 2);
+      // _shaderVermelha.SetMatrix4("model", model);
+      // _shaderVermelha.SetMatrix4("view", _camera.GetViewMatrix());
+      // _shaderVermelha.SetMatrix4("projection", _camera.GetProjectionMatrix());
+      // _shaderVermelha.Use();
+      // GL.DrawArrays(PrimitiveType.Lines, 0, 2);
       // EixoY
-      _shaderVerde.SetMatrix4("model", model);
-      _shaderVerde.SetMatrix4("view", _camera.GetViewMatrix());
-      _shaderVerde.SetMatrix4("projection", _camera.GetProjectionMatrix());
-      _shaderVerde.Use();
-      GL.DrawArrays(PrimitiveType.Lines, 2, 2);
+      // _shaderVerde.SetMatrix4("model", model);
+      // _shaderVerde.SetMatrix4("view", _camera.GetViewMatrix());
+      // _shaderVerde.SetMatrix4("projection", _camera.GetProjectionMatrix());
+      // _shaderVerde.Use();
+      // GL.DrawArrays(PrimitiveType.Lines, 2, 2);
       // EixoZ
-      _shaderAzul.SetMatrix4("model", model);
-      _shaderAzul.SetMatrix4("view", _camera.GetViewMatrix());
-      _shaderAzul.SetMatrix4("projection", _camera.GetProjectionMatrix());
-      _shaderAzul.Use();
-      GL.DrawArrays(PrimitiveType.Lines, 4, 2);
+      // _shaderAzul.SetMatrix4("model", model);
+      // _shaderAzul.SetMatrix4("view", _camera.GetViewMatrix());
+      // _shaderAzul.SetMatrix4("projection", _camera.GetProjectionMatrix());
+      // _shaderAzul.Use();
+      // GL.DrawArrays(PrimitiveType.Lines, 4, 2);
 #elif CG_DirectX && !CG_OpenGL
       Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
 #elif (CG_DirectX && CG_OpenGL) || (!CG_DirectX && !CG_OpenGL)

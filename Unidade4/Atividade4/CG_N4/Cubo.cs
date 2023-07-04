@@ -4,169 +4,64 @@
 using CG_Biblioteca;
 using OpenTK.Mathematics;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL4;
 using System.Collections.Generic;
+using OpenTK.Graphics.OpenGL4;
 
 namespace gcgcg
 {
   internal class Cubo : Objeto
   {
+    Vector3[] vertices;
+    int[] indices;
+    // Vector3[] normals;
 
-    public Cubo(Objeto paiRef, ref char _rotulo, Shader cor) : base(paiRef, ref _rotulo)
+    List<Ponto4D> listaPtos = new List<Ponto4D>();
+
+    public Cubo(Objeto paiRef, ref char _rotulo) : base(paiRef, ref _rotulo)
     {
-      List<Ponto4D> ptosFrente_0 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, -0.5, 0.5),
-        new Ponto4D(0.5, -0.5, 0.5),
-        new Ponto4D(0.5, 0.5, 0.5),
-        new Ponto4D(-0.5, 0.5, 0.5)
+      vertices = new Vector3[]
+      {
+        new Vector3(-1.0f, -1.0f,  1.0f),
+        new Vector3( 1.0f, -1.0f,  1.0f),
+        new Vector3( 1.0f,  1.0f,  1.0f),
+        new Vector3(-1.0f,  1.0f,  1.0f),
+        new Vector3(-1.0f, -1.0f, -1.0f),
+        new Vector3( 1.0f, -1.0f, -1.0f),
+        new Vector3( 1.0f,  1.0f, -1.0f),
+        new Vector3(-1.0f,  1.0f, -1.0f)
       };
 
-      Objeto faceFrente_0 = new Poligono(paiRef, ref _rotulo, ptosFrente_0);
-      //faceFrente.ObjetoCor = cor;
-      faceFrente_0.ObjetoAtualizar();
-      faceFrente_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosFrente_1 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, 0.5, 0.5),
-        new Ponto4D(0.5, 0.5, 0.5),
-        new Ponto4D(0.5, -0.5, 0.5),
-        new Ponto4D(-0.5, -0.5, 0.5)
+      indices = new int[]
+      {
+        0, 1, 2, 2, 3, 0, // front face
+        3, 2, 6, 6, 7, 3, // top face
+        7, 6, 5, 5, 4, 7, // back face
+        4, 0, 3, 3, 7, 4, // left face
+        0, 1, 5, 5, 4, 0, // bottom face  
+        1, 5, 6, 6, 2, 1, // right face
       };
 
-      Objeto faceFrente_1 = new Poligono(paiRef, ref _rotulo, ptosFrente_1);
-      //faceFrente_1.ObjetoCor = cor;
-      faceFrente_1.ObjetoAtualizar();
-      faceFrente_1.PrimitivaTipo = PrimitiveType.TriangleFan;
+      // normals = new Vector3[]
+      // {
+      //   new Vector3(-1.0f, -1.0f,  1.0f),
+      //   new Vector3( 1.0f, -1.0f,  1.0f),
+      //   new Vector3( 1.0f,  1.0f,  1.0f),
+      //   new Vector3(-1.0f,  1.0f,  1.0f),
+      //   new Vector3(-1.0f, -1.0f, -1.0f),
+      //   new Vector3( 1.0f, -1.0f, -1.0f),
+      //   new Vector3( 1.0f,  1.0f, -1.0f),
+      //   new Vector3(-1.0f,  1.0f, -1.0f),
+      // };
 
-      // ---
+      foreach (Vector3 v in vertices)
+        listaPtos.Add(new Ponto4D(v.X, v.Y, v.Z));
 
-      List<Ponto4D> ptosAbaixo_0 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, -0.5, -0.5),
-        new Ponto4D(0.5, -0.5, -0.5),
-        new Ponto4D(-0.5, -0.5, 0.5),
-        new Ponto4D(0.5, -0.5, 0.5)
-      };
+      Objeto cubo = new Objeto(paiRef, ref _rotulo);
+      cubo.PrimitivaTipo = PrimitiveType.Triangles;
 
-      Objeto faceAbaixo_0 = new Poligono(paiRef, ref _rotulo, ptosAbaixo_0);
-      //faceAbaixo_0.ObjetoCor = cor;
-      faceAbaixo_0.ObjetoAtualizar();
-      faceAbaixo_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosAbaixo_1 = new List<Ponto4D>() {
-        new Ponto4D(0.5, -0.5, 0.5),
-        new Ponto4D(-0.5, -0.5, 0.5),
-        new Ponto4D(0.5, -0.5, -0.5),
-        new Ponto4D(-0.5, -0.5, -0.5)
-      };
-
-      Objeto faceAbaixo_1 = new Poligono(paiRef, ref _rotulo, ptosAbaixo_1);
-      //faceAbaixo_0.ObjetoCor = cor;
-      faceAbaixo_1.ObjetoAtualizar();
-      faceAbaixo_1.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      // ---
-
-      List<Ponto4D> ptosAtras_0 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, -0.5, -0.5),
-        new Ponto4D(0.5, -0.5, -0.5),
-        new Ponto4D(-0.5, 0.5, -0.5),
-        new Ponto4D(0.5, 0.5, -0.5)
-      };
-
-      Objeto faceAtras_0 = new Poligono(paiRef, ref _rotulo, ptosAtras_0);
-      //faceAtras.ObjetoCor = cor;
-      faceAtras_0.ObjetoAtualizar();
-      faceAtras_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosAtras_1 = new List<Ponto4D>() {
-        new Ponto4D(0.5, -0.5, -0.5),
-        new Ponto4D(0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, -0.5, -0.5)
-      };
-
-      Objeto faceAtras_1 = new Poligono(paiRef, ref _rotulo, ptosAtras_1);
-      //faceAtras.ObjetoCor = cor;
-      faceAtras_1.ObjetoAtualizar();
-      faceAtras_1.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      // ---
-
-      List<Ponto4D> ptosEsquerda_0 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, -0.5, -0.5),
-        new Ponto4D(-0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, -0.5, 0.5),
-        new Ponto4D(-0.5, 0.5, 0.5)
-      };
-
-      Objeto faceEsquerda_0 = new Poligono(paiRef, ref _rotulo, ptosEsquerda_0);
-      //faceEsquerda.ObjetoCor = cor;
-      faceEsquerda_0.ObjetoAtualizar();
-      faceEsquerda_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosEsquerda_1 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, 0.5, 0.5),
-        new Ponto4D(-0.5, -0.5, 0.5),
-        new Ponto4D(-0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, -0.5, -0.5)
-      };
-
-      Objeto faceEsquerda_1 = new Poligono(paiRef, ref _rotulo, ptosEsquerda_1);
-      //faceEsquerda_1.ObjetoCor = cor;
-      faceEsquerda_1.ObjetoAtualizar();
-      faceEsquerda_1.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      // ---
-
-      List<Ponto4D> ptosDireita_0 = new List<Ponto4D>() {
-        new Ponto4D(0.5, -0.5, -0.5),
-        new Ponto4D(0.5, 0.5, -0.5),
-        new Ponto4D(0.5, -0.5, 0.5),
-        new Ponto4D(0.5, 0.5, 0.5)
-      };
-
-      Objeto faceDireita_0 = new Poligono(paiRef, ref _rotulo, ptosDireita_0);
-      //faceDireita_0.ObjetoCor = cor;
-      faceDireita_0.ObjetoAtualizar();
-      faceDireita_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosDireita_1 = new List<Ponto4D>() {
-        new Ponto4D(0.5, 0.5, 0.5),
-        new Ponto4D(0.5, -0.5, 0.5),
-        new Ponto4D(0.5, 0.5, -0.5),
-        new Ponto4D(0.5, -0.5, -0.5)   
-      };
-
-      Objeto faceDireita_1 = new Poligono(paiRef, ref _rotulo, ptosDireita_1);
-      //faceDireita_1.ObjetoCor = cor;
-      faceDireita_1.ObjetoAtualizar();
-      faceDireita_1.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      // ---
-
-      List<Ponto4D> ptosAcima_0 = new List<Ponto4D>() {
-        new Ponto4D(-0.5, 0.5, -0.5),
-        new Ponto4D(0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, 0.5, 0.5),
-        new Ponto4D(0.5, 0.5, 0.5)
-      };
-
-      Objeto faceAcima_0 = new Poligono(paiRef, ref _rotulo, ptosAcima_0);
-      //faceAcima_0.ObjetoCor = new Cor(255, 145, 255, 255);
-      faceAcima_0.ObjetoAtualizar();
-      faceAcima_0.PrimitivaTipo = PrimitiveType.TriangleFan;
-
-      List<Ponto4D> ptosAcima_1 = new List<Ponto4D>() {
-        new Ponto4D(0.5, 0.5, 0.5),
-        new Ponto4D(-0.5, 0.5, 0.5),
-        new Ponto4D(0.5, 0.5, -0.5),
-        new Ponto4D(-0.5, 0.5, -0.5),       
-      };
-
-      Objeto faceAcima_1 = new Poligono(paiRef, ref _rotulo, ptosAcima_1);
-      //faceAcima_1.ObjetoCor = new Cor(255, 145, 255, 255);
-      faceAcima_1.ObjetoAtualizar();
-      faceAcima_1.PrimitivaTipo = PrimitiveType.TriangleFan;
+      for (int i = 0; i < 36; i++) {
+        cubo.PontosAdicionar(listaPtos[indices[i]]);
+      }
 
       Atualizar();
     }
