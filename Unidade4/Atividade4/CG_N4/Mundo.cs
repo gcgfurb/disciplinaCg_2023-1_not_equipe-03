@@ -112,8 +112,8 @@ namespace gcgcg
     private int _vaoLamp;
 
     private Camera _camera;
-    private float anguloX;
-    private float anguloY;
+    private float deltaX;
+    private float deltaY;
 
     public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
            : base(gameWindowSettings, nativeWindowSettings)
@@ -218,8 +218,8 @@ namespace gcgcg
 
       CursorState = CursorState.Grabbed;
 
-      anguloX = 0;
-      anguloY = 0;
+      deltaX = 0;
+      deltaY = 0;
 
       _camera = new Camera(new Vector3(0.0f, 0.0f, 5.0f), Size.X / (float)Size.Y);
     }
@@ -279,16 +279,16 @@ namespace gcgcg
     protected override void OnMouseMove(MouseMoveEventArgs e) {
       base.OnMouseMove(e);
 
-      anguloX += e.DeltaX;
-      anguloY += e.DeltaY;
+      deltaX += e.DeltaX;
+      deltaY += e.DeltaY;
 
-      if  (anguloY > 100)
-          anguloY = 100;
-      else if (anguloY < -100)
-          anguloY = -100;
+      if  (deltaY > 100)
+          deltaY = 100;
+      else if (deltaY < -100)
+          deltaY = -100;
 
-      Ponto4D posXZ = Matematica.GerarPtosCirculo(anguloX, 5.0f);
-      Ponto4D posY = Matematica.GerarPtosCirculo(anguloY, 5.0f);
+      Ponto4D posXZ = Matematica.GerarPtosCirculo(deltaX, 5.0f);
+      Ponto4D posY = Matematica.GerarPtosCirculo(deltaY, 5.0f);
       
       _camera.Position = new Vector3((float) posXZ.X, (float) posY.Y, (float) posXZ.Y);
     }
